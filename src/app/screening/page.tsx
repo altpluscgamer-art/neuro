@@ -14,9 +14,19 @@ import {
   Home,
   BookOpen,
   ArrowRight,
+  Download,
+  Send,
+  Phone,
+  Mail,
+  MessageCircle,
+  Activity,
 } from "lucide-react";
 import { clsx } from "clsx";
-import type { ScreeningReport } from "@/lib/screening-logic";
+import type {
+  ScreeningReport,
+  SyndromeDetection,
+  NeuropsychProfile,
+} from "@/lib/screening-logic";
 
 const ageOptions = [
   { value: "1-2", label: "1–2 года" },
@@ -53,17 +63,116 @@ const strengthOptions = [
   { value: "музыкальный", label: "Музыкальный" },
 ];
 
+const frequencyOptions = [
+  { value: "часто" as const, label: "Часто" },
+  { value: "иногда" as const, label: "Иногда" },
+  { value: "редко" as const, label: "Редко" },
+];
+
+const messengerOptions = [
+  { value: "telegram" as const, label: "Telegram", icon: Send },
+  { value: "whatsapp" as const, label: "WhatsApp", icon: MessageCircle },
+  { value: "email" as const, label: "Email", icon: Mail },
+];
+
+const concernLabelMap: Record<string, string> = Object.fromEntries(
+  concernOptions.map((o) => [o.value, o.label])
+);
+
+const LURIA_BLOCK_META = [
+  {
+    key: "block1" as const,
+    name: "Блок 1: Энергетический",
+    subtitle: "активация, работоспособность",
+  },
+  {
+    key: "block2" as const,
+    name: "Блок 2: Информационный",
+    subtitle: "восприятие, память, речь",
+  },
+  {
+    key: "block3" as const,
+    name: "Блок 3: Регуляторный",
+    subtitle: "внимание, самоконтроль, планирование",
+  },
+];
+
+const severityStyle: Record<
+  string,
+  { bg: string; text: string; label: string }
+> = {
+  мягкий: { bg: "bg-yellow-100", text: "text-yellow-800", label: "Мягкий" },
+  умеренный: {
+    bg: "bg-orange-100",
+    text: "text-orange-800",
+    label: "Умеренный",
+  },
+  выраженный: {
+    bg: "bg-red-100",
+    text: "text-red-800",
+    label: "Выраженный",
+  },
+};
+
 interface ScreeningFormData {
   childAge: string;
   concerns: string[];
+  concernFrequencies: Record<string, "часто" | "иногда" | "редко">;
   strengths: string[];
+  parentName: string;
+  parentPhone: string;
+  parentEmail: string;
+  messenger: "telegram" | "whatsapp" | "email";
 }
 
-const STEP_LABELS = ["Возраст", "Опасения", "Сильные стороны"];
+const STEP_LABELS = [
+  "Возраст",
+  "Опасения",
+  "Частота",
+  "Сильные стороны",
+  "Контакты",
+];
+
+function getBarStyle(score: number, maxScore: number) {
+  const ratio = maxScore > 0 ? score / maxScore : 0;
+  const healthPct = Math.round((1 - ratio) * 100);
+  if (ratio >= 0.65)
+    return {
+      healthPct,
+      bar: "bg-red-500",
+      track: "bg-red-100",
+      text: "text-red-700",
+      label: "Выраженные трудности",
+    };
+  if (ratio >= 0.4)
+    return {
+      healthPct,
+      bar: "bg-orange-500",
+      track: "bg-orange-100",
+      text: "text-orange-700",
+      label: "Умеренные трудности",
+    };
+  if (ratio >= 0.2)
+    return {
+      healthPct,
+      bar: "bg-yellow-500",
+      track: "bg-yellow-100",
+      text: "text-yellow-700",
+      label: "Лёгкие трудности",
+    };
+  return {
+    healthPct,
+    bar: "bg-emerald-500",
+    track: "bg-emerald-100",
+    text: "text-emerald-700",
+    label: "Норма",
+  };
+}
 
 export default function ScreeningPage() {
   const [step, setStep] = useState(0);
   const [report, setReport] = useState<ScreeningReport | null>(null);
+  const [reportId, setReportId] = useState("");
   const [submitting, setSubmitting] = useState(false);
   const [fade, setFade] = useState(false);
   const [submitError, setSubmitError] = useState("");
@@ -78,13 +187,23 @@ export default function ScreeningPage() {
     defaultValues: {
       childAge: "",
       concerns: [],
+      concernFrequencies: {},
       strengths: [],
+      parentName: "",
+      parentPhone: "",
+      parentEmail: "",
+      messenger: "telegram",
     },
   });
 
   const childAge = watch("childAge") || "";
   const concerns = watch("concerns") || [];
+  const concernFrequencies = watch("concernFrequencies") || {};
   const strengths = watch("strengths") || [];
+  const parentName = watch("parentName") || "";
+  const parentPhone = watch("parentPhone") || "";
+  const parentEmail = watch("parentEmail") || "";
+  const messenger = watch("messenger") || "telegram";
 
   const transitionTo = (next: number) => {
     setFade(true);
@@ -100,10 +219,7 @@ export default function ScreeningPage() {
     clearErrors("childAge");
   };
 
-  const toggleItem = (
-    field: "concerns" | "strengths",
-    value: string
-  ) => {
+  const toggleItem = (field: "concerns" | "strengths", value: string) => {
     const current = watch(field) || [];
     const next = current.includes(value)
       ? current.filter((v: string) => v !== value)
@@ -112,18 +228,51 @@ export default function ScreeningPage() {
     clearErrors(field);
   };
 
+  const setFrequency = (
+    concern: string,
+    freq: "часто" | "иногда" | "редко"
+  ) => {
+    const current = watch("concernFrequencies") || {};
+    setValue("concernFrequencies", { ...current, [concern]: freq });
+    clearErrors("concernFrequencies");
+  };
+
   const handleNext = () => {
     if (step === 1 && !childAge) {
       setError("childAge", { message: "Выберите возраст ребёнка" });
       return;
     }
-    if (step === 3 && strengths.length === 0) {
+    if (step === 3 && concerns.length > 0) {
+      const freqs = watch("concernFrequencies") || {};
+      const missing = concerns.some((c: string) => !freqs[c]);
+      if (missing) {
+        setError("concernFrequencies", {
+          message: "Укажите частоту для каждого выбранного опасения",
+        });
+        return;
+      }
+    }
+    if (step === 4 && strengths.length === 0) {
       setError("strengths", {
         message: "Выберите хотя бы одну сильную сторону",
       });
       return;
     }
-    if (step === 3) {
+    if (step === 5) {
+      let hasError = false;
+      if (!parentName.trim()) {
+        setError("parentName", { message: "Введите ваше имя" });
+        hasError = true;
+      }
+      if (!parentPhone.trim()) {
+        setError("parentPhone", { message: "Введите номер телефона" });
+        hasError = true;
+      }
+      if (!parentEmail.trim() || !parentEmail.includes("@")) {
+        setError("parentEmail", { message: "Введите корректный email" });
+        hasError = true;
+      }
+      if (hasError) return;
       submitForm();
       return;
     }
@@ -138,28 +287,56 @@ export default function ScreeningPage() {
     setSubmitting(true);
     setSubmitError("");
     try {
+      const freqs = watch("concernFrequencies") || {};
       const res = await fetch("/api/screening", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ childAge, concerns, strengths }),
+        body: JSON.stringify({
+          childAge,
+          concerns,
+          concernFrequencies: freqs,
+          strengths,
+          parentName: parentName.trim(),
+          parentPhone: parentPhone.trim(),
+          parentEmail: parentEmail.trim(),
+          messenger,
+        }),
       });
       if (!res.ok) {
         const data = await res.json().catch(() => null);
         throw new Error(data?.error || "Ошибка сервера");
       }
       const data = await res.json();
+      setReportId(data.id);
       setReport(data.report);
-      transitionTo(4);
+      transitionTo(6);
     } catch (e: unknown) {
-      const msg = e instanceof Error ? e.message : "Произошла ошибка. Попробуйте ещё раз.";
+      const msg =
+        e instanceof Error
+          ? e.message
+          : "Произошла ошибка. Попробуйте ещё раз.";
       setSubmitError(msg);
     } finally {
       setSubmitting(false);
     }
   };
 
+  const resetForm = () => {
+    setReport(null);
+    setReportId("");
+    setValue("childAge", "");
+    setValue("concerns", []);
+    setValue("concernFrequencies", {});
+    setValue("strengths", []);
+    setValue("parentName", "");
+    setValue("parentPhone", "");
+    setValue("parentEmail", "");
+    setValue("messenger", "telegram");
+    transitionTo(0);
+  };
+
   const renderProgressBar = () => {
-    if (step === 0 || step === 4) return null;
+    if (step === 0 || step === 6) return null;
     const dataStep = step - 1;
 
     return (
@@ -169,26 +346,34 @@ export default function ScreeningPage() {
             const completed = i < dataStep;
             const current = i === dataStep;
             return (
-              <div key={label} className="flex items-center flex-1 last:flex-none">
+              <div
+                key={label}
+                className="flex items-center flex-1 last:flex-none"
+              >
                 <div className="flex flex-col items-center">
                   <div
                     className={clsx(
-                      "flex h-8 w-8 items-center justify-center rounded-full text-sm font-semibold transition-colors",
+                      "flex h-7 w-7 items-center justify-center rounded-full text-xs font-semibold transition-colors",
                       completed && "bg-primary-600 text-white",
-                      current && "bg-primary-100 text-primary-700 ring-2 ring-primary-600",
+                      current &&
+                        "bg-primary-100 text-primary-700 ring-2 ring-primary-600",
                       !completed && !current && "bg-gray-100 text-gray-400"
                     )}
                   >
                     {completed ? (
-                      <CheckCircle2 className="h-5 w-5" />
+                      <CheckCircle2 className="h-4 w-4" />
                     ) : (
                       i + 1
                     )}
                   </div>
                   <span
                     className={clsx(
-                      "mt-1 text-xs font-medium",
-                      current ? "text-primary-700" : completed ? "text-primary-600" : "text-gray-400"
+                      "mt-1 text-[10px] font-medium leading-tight text-center",
+                      current
+                        ? "text-primary-700"
+                        : completed
+                          ? "text-primary-600"
+                          : "text-gray-400"
                     )}
                   >
                     {label}
@@ -197,7 +382,7 @@ export default function ScreeningPage() {
                 {i < STEP_LABELS.length - 1 && (
                   <div
                     className={clsx(
-                      "mx-2 h-0.5 flex-1 transition-colors",
+                      "mx-1.5 h-0.5 flex-1 transition-colors",
                       i < dataStep ? "bg-primary-600" : "bg-gray-200"
                     )}
                   />
@@ -220,7 +405,7 @@ export default function ScreeningPage() {
       </h1>
       <p className="mb-6 max-w-md text-base leading-relaxed text-gray-600">
         Ответьте на несколько вопросов, чтобы получить персональные рекомендации
-        по развитию ребёнка.
+        по развитию ребёнка на основе нейропсихологического подхода.
       </p>
       <div className="mb-6 flex flex-wrap items-center justify-center gap-3">
         <span className="inline-flex items-center gap-1.5 rounded-full bg-primary-50 px-3 py-1.5 text-sm font-medium text-primary-700">
@@ -231,11 +416,16 @@ export default function ScreeningPage() {
           <AlertCircle className="h-3.5 w-3.5" />
           Не диагностика
         </span>
+        <span className="inline-flex items-center gap-1.5 rounded-full bg-violet-50 px-3 py-1.5 text-sm font-medium text-violet-700">
+          <BookOpen className="h-3.5 w-3.5" />
+          Методика А.Р. Лурии
+        </span>
       </div>
       <p className="mb-8 max-w-md text-sm leading-relaxed text-gray-500">
         Это не диагностика и не медицинское заключение, а образовательный
         скрининг. Результат поможет вам лучше понять особенности ребёнка и
-        подобрать подходящие занятия.
+        подобрать подходящие занятия. Методика основана на теории трёх
+        функциональных блоков мозга А.Р. Лурии.
       </p>
       <button
         type="button"
@@ -254,7 +444,8 @@ export default function ScreeningPage() {
         Сколько лет ребёнку?
       </h2>
       <p className="mb-6 text-sm text-gray-500">
-        Выберите возрастную группу для получения возраст-специфичных рекомендаций
+        Выберите возрастную группу для получения возраст-специфичных
+        рекомендаций
       </p>
       <div className="grid grid-cols-2 gap-3 sm:grid-cols-3">
         {ageOptions.map((opt) => {
@@ -335,6 +526,65 @@ export default function ScreeningPage() {
     </div>
   );
 
+  const renderFrequencyStep = () => (
+    <div>
+      <h2 className="mb-2 text-xl font-bold text-gray-900">
+        Как часто вы замечаете это?
+      </h2>
+      <p className="mb-6 text-sm text-gray-500">
+        Для каждого выбранного опасения укажите, как часто вы это замечаете.
+      </p>
+      {concerns.length === 0 ? (
+        <div className="rounded-xl border border-gray-200 bg-gray-50 p-6 text-center">
+          <p className="text-sm text-gray-500">
+            Вы не отметили конкретных опасений. Нажмите «Далее», чтобы
+            продолжить.
+          </p>
+        </div>
+      ) : (
+        <div className="space-y-4">
+          {concerns.map((concern) => {
+            const label = concernLabelMap[concern] || concern;
+            const freq = concernFrequencies[concern];
+            return (
+              <div
+                key={concern}
+                className="rounded-xl border border-gray-200 bg-white p-4"
+              >
+                <p className="mb-3 text-sm font-semibold text-gray-800">
+                  {label}
+                </p>
+                <div className="flex flex-wrap gap-2">
+                  {frequencyOptions.map((opt) => (
+                    <button
+                      key={opt.value}
+                      type="button"
+                      onClick={() => setFrequency(concern, opt.value)}
+                      className={clsx(
+                        "min-w-[80px] flex-1 rounded-lg border-2 px-3 py-2 text-center text-sm font-medium transition-all",
+                        freq === opt.value
+                          ? "border-primary-500 bg-primary-50 text-primary-700"
+                          : "border-gray-200 bg-white text-gray-600 hover:border-primary-300"
+                      )}
+                    >
+                      {opt.label}
+                    </button>
+                  ))}
+                </div>
+              </div>
+            );
+          })}
+        </div>
+      )}
+      {errors.concernFrequencies && (
+        <p className="mt-3 flex items-center gap-1.5 text-sm text-red-600">
+          <AlertCircle className="h-4 w-4 shrink-0" />
+          Укажите частоту для каждого выбранного опасения
+        </p>
+      )}
+    </div>
+  );
+
   const renderStrengthsStep = () => (
     <div>
       <h2 className="mb-2 text-xl font-bold text-gray-900">
@@ -388,6 +638,131 @@ export default function ScreeningPage() {
     </div>
   );
 
+  const renderContactStep = () => (
+    <div>
+      <h2 className="mb-2 text-xl font-bold text-gray-900">
+        Получите полный отчёт
+      </h2>
+      <p className="mb-6 text-sm text-gray-500">
+        Введите ваши данные, и мы отправим персональный отчёт с рекомендациями в
+        выбранный мессенджер или на почту.
+      </p>
+      <div className="space-y-4">
+        <div>
+          <label className="mb-1.5 block text-sm font-medium text-gray-700">
+            Ваше имя
+          </label>
+          <input
+            type="text"
+            value={parentName}
+            onChange={(e) => {
+              setValue("parentName", e.target.value);
+              clearErrors("parentName");
+            }}
+            placeholder="Введите ваше имя"
+            className={clsx(
+              "w-full rounded-xl border-2 bg-white px-4 py-3 text-sm text-gray-800 placeholder-gray-400 transition-colors focus:outline-none focus:ring-2 focus:ring-primary-200",
+              errors.parentName
+                ? "border-red-300 focus:border-red-500"
+                : "border-gray-200 focus:border-primary-500"
+            )}
+          />
+          {errors.parentName && (
+            <p className="mt-1.5 flex items-center gap-1.5 text-sm text-red-600">
+              <AlertCircle className="h-3.5 w-3.5 shrink-0" />
+              {errors.parentName.message}
+            </p>
+          )}
+        </div>
+        <div>
+          <label className="mb-1.5 block text-sm font-medium text-gray-700">
+            <span className="inline-flex items-center gap-1.5">
+              <Phone className="h-3.5 w-3.5 text-gray-400" />
+              Телефон
+            </span>
+          </label>
+          <input
+            type="tel"
+            value={parentPhone}
+            onChange={(e) => {
+              setValue("parentPhone", e.target.value);
+              clearErrors("parentPhone");
+            }}
+            placeholder="+7 (___) ___-__-__"
+            className={clsx(
+              "w-full rounded-xl border-2 bg-white px-4 py-3 text-sm text-gray-800 placeholder-gray-400 transition-colors focus:outline-none focus:ring-2 focus:ring-primary-200",
+              errors.parentPhone
+                ? "border-red-300 focus:border-red-500"
+                : "border-gray-200 focus:border-primary-500"
+            )}
+          />
+          {errors.parentPhone && (
+            <p className="mt-1.5 flex items-center gap-1.5 text-sm text-red-600">
+              <AlertCircle className="h-3.5 w-3.5 shrink-0" />
+              {errors.parentPhone.message}
+            </p>
+          )}
+        </div>
+        <div>
+          <label className="mb-1.5 block text-sm font-medium text-gray-700">
+            <span className="inline-flex items-center gap-1.5">
+              <Mail className="h-3.5 w-3.5 text-gray-400" />
+              Email
+            </span>
+          </label>
+          <input
+            type="email"
+            value={parentEmail}
+            onChange={(e) => {
+              setValue("parentEmail", e.target.value);
+              clearErrors("parentEmail");
+            }}
+            placeholder="email@example.com"
+            className={clsx(
+              "w-full rounded-xl border-2 bg-white px-4 py-3 text-sm text-gray-800 placeholder-gray-400 transition-colors focus:outline-none focus:ring-2 focus:ring-primary-200",
+              errors.parentEmail
+                ? "border-red-300 focus:border-red-500"
+                : "border-gray-200 focus:border-primary-500"
+            )}
+          />
+          {errors.parentEmail && (
+            <p className="mt-1.5 flex items-center gap-1.5 text-sm text-red-600">
+              <AlertCircle className="h-3.5 w-3.5 shrink-0" />
+              {errors.parentEmail.message}
+            </p>
+          )}
+        </div>
+        <div>
+          <label className="mb-3 block text-sm font-medium text-gray-700">
+            Как получить отчёт?
+          </label>
+          <div className="grid grid-cols-3 gap-3">
+            {messengerOptions.map((opt) => {
+              const Icon = opt.icon;
+              const selected = messenger === opt.value;
+              return (
+                <button
+                  key={opt.value}
+                  type="button"
+                  onClick={() => setValue("messenger", opt.value)}
+                  className={clsx(
+                    "flex flex-col items-center gap-2 rounded-xl border-2 px-3 py-4 text-center transition-all",
+                    selected
+                      ? "border-primary-500 bg-primary-50 text-primary-700"
+                      : "border-gray-200 bg-white text-gray-600 hover:border-primary-300"
+                  )}
+                >
+                  <Icon className="h-5 w-5" />
+                  <span className="text-sm font-medium">{opt.label}</span>
+                </button>
+              );
+            })}
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+
   const renderReport = () => {
     if (!report) return null;
 
@@ -404,6 +779,120 @@ export default function ScreeningPage() {
             На основе ваших ответов мы подготовили рекомендации
           </p>
         </div>
+
+        {report.neuropsychProfile && (
+          <section className="rounded-2xl border border-violet-200 bg-violet-50/50 p-6">
+            <div className="mb-4 flex items-center gap-2">
+              <Activity className="h-5 w-5 text-violet-600" />
+              <h3 className="text-lg font-bold text-violet-800">
+                {report.neuropsychProfile.title}
+              </h3>
+            </div>
+            <p className="mb-4 text-sm leading-relaxed text-violet-700">
+              {report.neuropsychProfile.intro}
+            </p>
+            <div className="space-y-5">
+              {LURIA_BLOCK_META.map((meta) => {
+                const block =
+                  report.neuropsychProfile!.profile[meta.key];
+                const style = getBarStyle(block.score, block.maxScore);
+                return (
+                  <div key={meta.key}>
+                    <div className="mb-1.5 flex items-center justify-between">
+                      <div>
+                        <p className="text-sm font-semibold text-gray-800">
+                          {meta.name}
+                        </p>
+                        <p className="text-xs text-gray-500">
+                          {meta.subtitle}
+                        </p>
+                      </div>
+                      <span className={clsx("text-xs font-medium", style.text)}>
+                        {style.label}
+                      </span>
+                    </div>
+                    <div
+                      className={clsx("h-3 w-full rounded-full", style.track)}
+                    >
+                      <div
+                        className={clsx(
+                          "h-3 rounded-full transition-all duration-500",
+                          style.bar
+                        )}
+                        style={{ width: `${style.healthPct}%` }}
+                      />
+                    </div>
+                    <p className="mt-1 text-xs text-gray-400">
+                      {block.score} / {block.maxScore}
+                    </p>
+                  </div>
+                );
+              })}
+            </div>
+          </section>
+        )}
+
+        {report.syndromes && report.syndromes.syndromes.length > 0 && (
+          <section className="rounded-2xl border border-orange-200 bg-orange-50/50 p-6">
+            <div className="mb-4 flex items-center gap-2">
+              <Brain className="h-5 w-5 text-orange-600" />
+              <h3 className="text-lg font-bold text-orange-800">
+                {report.syndromes.title}
+              </h3>
+            </div>
+            <p className="mb-4 text-sm leading-relaxed text-orange-700">
+              {report.syndromes.intro}
+            </p>
+            <div className="space-y-3">
+              {report.syndromes.syndromes.map((syndrome, i) => {
+                const sev =
+                  severityStyle[syndrome.severity] ??
+                  ({
+                    bg: "bg-gray-100",
+                    text: "text-gray-800",
+                    label: syndrome.severity,
+                  } as const);
+                return (
+                  <div
+                    key={i}
+                    className="rounded-xl border border-orange-200 bg-white p-4"
+                  >
+                    <div className="mb-2 flex flex-wrap items-center gap-2">
+                      <p className="text-sm font-semibold text-gray-800">
+                        {syndrome.name}
+                      </p>
+                      <span
+                        className={clsx(
+                          "rounded-full px-2.5 py-0.5 text-xs font-medium",
+                          sev.bg,
+                          sev.text
+                        )}
+                      >
+                        {sev.label}
+                      </span>
+                      <span className="text-xs text-gray-400">
+                        Блок {syndrome.block}
+                      </span>
+                    </div>
+                    <p className="mb-3 whitespace-pre-line text-sm leading-relaxed text-gray-600">
+                      {syndrome.description}
+                    </p>
+                    <div className="flex flex-wrap gap-1.5">
+                      {syndrome.matchedSymptoms.map((s) => (
+                        <span
+                          key={s}
+                          className="rounded-full bg-orange-100 px-2 py-0.5 text-xs text-orange-700"
+                        >
+                          {concernLabelMap[s] || s}
+                        </span>
+                      ))}
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          </section>
+        )}
 
         {report.strengthsSection.items.length > 0 && (
           <section className="rounded-2xl border border-emerald-200 bg-emerald-50/50 p-6">
@@ -592,18 +1081,21 @@ export default function ScreeningPage() {
             Записаться на диагностику
             <ArrowRight className="h-5 w-5" />
           </Link>
+          {reportId && (
+            <Link
+              href={`/api/screening/pdf/${reportId}`}
+              className="inline-flex items-center gap-2 rounded-xl border-2 border-primary-200 bg-primary-50 px-8 py-3 text-base font-semibold text-primary-700 transition-colors hover:bg-primary-100"
+            >
+              <Download className="h-5 w-5" />
+              Скачать PDF-отчёт
+            </Link>
+          )}
           <button
             type="button"
-            onClick={() => {
-              setReport(null);
-              setValue("childAge", "");
-              setValue("concerns", []);
-              setValue("strengths", []);
-              transitionTo(0);
-            }}
+            onClick={resetForm}
             className="text-sm font-medium text-gray-500 transition-colors hover:text-primary-600"
           >
-            Пройти скрининг заново
+            Пройти заново
           </button>
         </div>
       </div>
@@ -619,8 +1111,12 @@ export default function ScreeningPage() {
       case 2:
         return renderConcernsStep();
       case 3:
-        return renderStrengthsStep();
+        return renderFrequencyStep();
       case 4:
+        return renderStrengthsStep();
+      case 5:
+        return renderContactStep();
+      case 6:
         return renderReport();
       default:
         return null;
@@ -644,7 +1140,7 @@ export default function ScreeningPage() {
             {renderCurrentStep()}
           </div>
 
-          {step > 0 && step < 4 && (
+          {step > 0 && step < 6 && (
             <div className="mt-8 flex items-center justify-between border-t border-gray-100 pt-6">
               {step > 1 ? (
                 <button
@@ -693,7 +1189,7 @@ export default function ScreeningPage() {
                     </svg>
                     Формируем отчёт…
                   </>
-                ) : step === 3 ? (
+                ) : step === 5 ? (
                   <>
                     <Sparkles className="h-4 w-4" />
                     Получить отчёт

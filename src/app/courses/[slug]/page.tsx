@@ -1,6 +1,7 @@
 import { notFound } from "next/navigation";
 import Link from "next/link";
 import prisma from "@/lib/prisma";
+import SEOHead from "@/components/SEOHead";
 import { Video, Play, Clock, ArrowLeft, BookOpen } from "lucide-react";
 import type { Metadata } from "next";
 
@@ -13,8 +14,22 @@ export async function generateMetadata({
   const course = await prisma.course.findUnique({ where: { slug } });
   if (!course || !course.isPublished) return { title: "Не найдено" };
   return {
-    title: `${course.title} — Нейропсихолог онлайн`,
+    title: course.title,
     description: course.excerpt,
+    openGraph: {
+      type: "website",
+      title: course.title,
+      description: course.excerpt ?? undefined,
+      locale: "ru_RU",
+      siteName: "Нейро",
+      ...(course.image && { images: [course.image] }),
+    },
+    twitter: {
+      card: "summary_large_image",
+      title: course.title,
+      description: course.excerpt ?? undefined,
+      ...(course.image && { images: [course.image] }),
+    },
   };
 }
 
@@ -30,6 +45,14 @@ export default async function CoursePage({
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-indigo-50/40 to-white">
+      <SEOHead
+        type="course"
+        title={course.title}
+        description={course.excerpt ?? ""}
+        url={`/courses/${course.slug}`}
+        image={course.image ?? undefined}
+        price={course.price > 0 ? course.price : undefined}
+      />
       <div className="mx-auto max-w-4xl px-4 py-12 sm:px-6 lg:px-8">
         <Link
           href="/courses"

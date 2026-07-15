@@ -7,7 +7,17 @@ import { generateReport } from "@/lib/screening-logic";
 export async function POST(request: Request) {
   try {
     const body = await request.json();
-    const { childAge, concerns, strengths, userId: bodyUserId } = body;
+    const {
+      childAge,
+      concerns,
+      concernFrequencies,
+      strengths,
+      parentName,
+      parentPhone,
+      parentEmail,
+      messenger,
+      userId: bodyUserId,
+    } = body;
 
     if (!childAge || typeof childAge !== "string") {
       return NextResponse.json(
@@ -30,10 +40,17 @@ export async function POST(request: Request) {
       );
     }
 
-    const report = generateReport(childAge, concerns, strengths);
+    const report = generateReport(
+      childAge,
+      concerns,
+      concernFrequencies || {},
+      strengths
+    );
 
     const session = await getServerSession(authOptions);
-    const sessionUserId = session?.user ? (session.user as { id?: string }).id : undefined;
+    const sessionUserId = session?.user
+      ? (session.user as { id?: string }).id
+      : undefined;
     const userId = bodyUserId ?? sessionUserId ?? null;
 
     const result = await prisma.screeningResult.create({
@@ -41,8 +58,15 @@ export async function POST(request: Request) {
         userId,
         childAge,
         concerns: JSON.stringify(concerns),
+        concernFrequencies: concernFrequencies
+          ? JSON.stringify(concernFrequencies)
+          : null,
         strengths: JSON.stringify(strengths),
         report: JSON.stringify(report),
+        parentName: parentName || null,
+        parentPhone: parentPhone || null,
+        parentEmail: parentEmail || null,
+        messenger: messenger || null,
         completed: true,
       },
     });

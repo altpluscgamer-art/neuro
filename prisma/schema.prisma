@@ -104,10 +104,15 @@ model ScreeningResult {
   id           String   @id @default(cuid())
   userId       String?
   childAge     String
-  concerns     String
-  strengths    String
-  report       String
+  concerns            String
+  concernFrequencies  String?
+  strengths           String
+  report              String
   completed    Boolean  @default(false)
+  parentName   String?
+  parentPhone  String?
+  parentEmail  String?
+  messenger    String?
   createdAt    DateTime @default(now())
 
   user         User?    @relation(fields: [userId], references: [id])

@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import prisma from "@/lib/prisma";
+import SEOHead from "@/components/SEOHead";
 import {
   Brain,
   Sparkles,
@@ -15,9 +16,14 @@ import {
 } from "lucide-react";
 
 export const metadata: Metadata = {
-  title: "Услуги — Нейро",
+  title: "Услуги",
   description:
     "Нейропсихологические услуги для детей от 1 до 13 лет: диагностика, консультации, коррекционные программы и онлайн-курсы.",
+  openGraph: {
+    title: "Услуги — Нейро",
+    description:
+      "Нейропсихологические услуги для детей от 1 до 13 лет: диагностика, консультации, коррекционные программы и онлайн-курсы.",
+  },
 };
 
 const iconMap: Record<string, LucideIcon> = {
@@ -56,6 +62,14 @@ export default async function ServicesPage() {
 
   return (
     <>
+      <SEOHead
+        type="service"
+        title="Услуги — Нейро"
+        description="Нейропсихологические услуги для детей от 1 до 13 лет: диагностика, консультации, коррекционные программы и онлайн-курсы."
+        url="/services"
+        author="Мария Иванова"
+      />
+
       <section className="bg-gradient-to-br from-primary-50 via-white to-accent-50 py-16 sm:py-24">
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
           <div className="mx-auto max-w-2xl text-center">
@@ -79,6 +93,13 @@ export default async function ServicesPage() {
                   key={service.id}
                   className="group flex flex-col rounded-2xl border border-gray-100 bg-white p-6 shadow-sm transition-shadow hover:shadow-md"
                 >
+                  <SEOHead
+                    type="service"
+                    title={service.title}
+                    description={service.description}
+                    url={`/services/${service.slug}`}
+                    author="Мария Иванова"
+                  />
                   <div className="mb-4 inline-flex self-start rounded-xl bg-primary-50 p-3">
                     <ServiceIcon name={service.icon} />
                   </div>

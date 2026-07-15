@@ -1,6 +1,7 @@
 import { notFound } from "next/navigation";
 import Link from "next/link";
 import prisma from "@/lib/prisma";
+import SEOHead from "@/components/SEOHead";
 import { BookOpen, Tag, ArrowLeft, Calendar } from "lucide-react";
 import type { Metadata } from "next";
 
@@ -13,8 +14,22 @@ export async function generateMetadata({
   const article = await prisma.article.findUnique({ where: { slug } });
   if (!article || !article.isPublished) return { title: "Не найдено" };
   return {
-    title: `${article.title} — Нейропсихолог онлайн`,
+    title: article.title,
     description: article.excerpt,
+    openGraph: {
+      type: "article",
+      title: article.title,
+      description: article.excerpt ?? undefined,
+      publishedTime: article.createdAt.toISOString(),
+      authors: ["Мария Иванова"],
+      locale: "ru_RU",
+      siteName: "Нейро",
+    },
+    twitter: {
+      card: "summary_large_image",
+      title: article.title,
+      description: article.excerpt ?? undefined,
+    },
   };
 }
 
@@ -40,6 +55,14 @@ export default async function ArticlePage({
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-indigo-50/40 to-white">
+      <SEOHead
+        type="article"
+        title={article.title}
+        description={article.excerpt ?? ""}
+        url={`/materials/${article.slug}`}
+        datePublished={article.createdAt.toISOString()}
+        author="Мария Иванова"
+      />
       <div className="mx-auto max-w-6xl px-4 py-12 sm:px-6 lg:px-8">
         <Link
           href="/materials"

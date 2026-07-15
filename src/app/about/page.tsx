@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
+import SEOHead from "@/components/SEOHead";
 import {
   GraduationCap,
   Award,
@@ -12,9 +13,14 @@ import {
 } from "lucide-react";
 
 export const metadata: Metadata = {
-  title: "Обо мне — Нейро",
+  title: "Обо мне",
   description:
     "Квалифицированный детский нейропсихолог с многолетним опытом работы. Образование, дипломы и отзывы родителей.",
+  openGraph: {
+    title: "Обо мне — Нейро",
+    description:
+      "Квалифицированный детский нейропсихолог с многолетним опытом работы. Образование, дипломы и отзывы родителей.",
+  },
 };
 
 const credentials = [
@@ -63,6 +69,41 @@ const placeholderTestimonials = [
 export default function AboutPage() {
   return (
     <>
+      <SEOHead
+        type="website"
+        title="Нейро — Обо мне"
+        description="Квалифицированный детский нейропсихолог с многолетним опытом работы. Образование, дипломы и отзывы родителей."
+        url="/about"
+      />
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{
+          __html: JSON.stringify({
+            "@context": "https://schema.org",
+            "@type": "Person",
+            name: "Мария Иванова",
+            jobTitle: "Детский нейропсихолог",
+            description:
+              "Детский нейропсихолог с более чем 10-летним опытом помощи детям и их семьям",
+            knowsAbout: [
+              "Нейропсихологическая диагностика",
+              "Нейропсихологическая коррекция",
+              "Детская психология",
+              "Методика замещающего онтогенеза",
+            ],
+            alumniOf: {
+              "@type": "CollegeOrUniversity",
+              name: "МГУ им. М.В. Ломоносова",
+            },
+            credential: [
+              "Сертификат нейропсихолога (Институт нейропсихологии им. А.Р. Лурии)",
+              "Диплом по специальной психологии и коррекционной педагогике",
+              "Сертификат по методике замещающего онтогенеза",
+            ],
+          }).replace(/</g, "\\u003c"),
+        }}
+      />
+
       <section className="bg-gradient-to-br from-primary-50 via-white to-accent-50 py-16 sm:py-24">
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
           <div className="grid items-center gap-12 lg:grid-cols-2">

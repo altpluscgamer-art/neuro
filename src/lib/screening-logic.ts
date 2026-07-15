@@ -1,5 +1,9 @@
 export type AgeGroup = "1-2" | "2-3" | "3-5" | "5-7" | "7-10" | "10-13";
 
+export type ConcernFrequency = "часто" | "иногда" | "редко";
+
+export type Messenger = "telegram" | "whatsapp" | "email";
+
 export interface StrengthItem {
   label: string;
   description: string;
@@ -29,12 +33,40 @@ export interface SpecialistRecommendation {
   urgency: "normal" | "high";
 }
 
+export interface SyndromeDetection {
+  name: string;
+  block: 1 | 2 | 3;
+  description: string;
+  severity: "выраженный" | "умеренный" | "мягкий";
+  matchedSymptoms: string[];
+}
+
+export interface NeuropsychProfile {
+  block1: { label: string; score: number; maxScore: number; status: string };
+  block2: { label: string; score: number; maxScore: number; status: string };
+  block3: { label: string; score: number; maxScore: number; status: string };
+}
+
+export interface NeuropsychProfileSection {
+  title: string;
+  intro: string;
+  profile: NeuropsychProfile;
+}
+
+export interface SyndromesSection {
+  title: string;
+  intro: string;
+  syndromes: SyndromeDetection[];
+}
+
 export interface ScreeningReport {
+  neuropsychProfile: NeuropsychProfileSection;
   strengthsSection: {
     title: string;
     intro: string;
     items: StrengthItem[];
   };
+  syndromes: SyndromesSection;
   concernsSection: {
     title: string;
     intro: string;
@@ -657,6 +689,318 @@ const CONCERN_MATERIALS: Record<string, MaterialLink[]> = {
   ],
 };
 
+const FREQUENCY_MULTIPLIER: Record<ConcernFrequency, number> = {
+  "часто": 3,
+  "иногда": 2,
+  "редко": 1,
+};
+
+interface SyndromeRule {
+  id: string;
+  name: string;
+  block: 1 | 2 | 3;
+  symptomWeights: Record<string, number>;
+  description: string;
+  everydayImpact: string;
+  luriaExplanation: string;
+}
+
+const SYNDROME_RULES: SyndromeRule[] = [
+  {
+    id: "energy-deficit",
+    name: "Синдром энергодефицита",
+    block: 1,
+    symptomWeights: {
+      "быстро устаёт": 1.0,
+      "плохо засыпает": 0.7,
+      "трудно сидеть на месте": 0.3,
+    },
+    description:
+      "Снижение энергетического ресурса нервной системы — базового условия для работы всех остальных функций.",
+    everydayImpact:
+      "В повседневной жизни это проявляется как быстрая утомляемость при умственных нагрузках, трудности с засыпанием и утренним пробуждением, колебания внимания и работоспособности в течение дня. Ребёнок может начать дело с энтузиазмом, но быстро «выдыхается» — не потому, что не хочет, а потому, что ресурс закончился.",
+    luriaExplanation:
+      "Согласно теории А.Р. Лурия, первый функциональный блок мозга — блок регуляции тонуса и бодрствования — обеспечивает базовый энергетический ресурс для работы всех остальных систем. Этот блок включает ретикулярную формацию ствола мозга, неспецифические структуры таламуса и лимбической системы. Когда функции этого блока ослаблены, страдает не конкретная операция, а общий нейродинамический тонус — условие, необходимое для работы и второго, и третьего блоков. Это не лень и не «особенность характера» — это объективная слабость нейродинамического обеспечения, требующая правильного режима, дозированной нагрузки и постепенного расширения ресурса.",
+  },
+  {
+    id: "regulatory-immaturity",
+    name: "Синдром незрелости регуляторных функций",
+    block: 3,
+    symptomWeights: {
+      "трудно сидеть на месте": 0.8,
+      "истерики": 0.7,
+      "агрессия": 0.7,
+      "плохо концентрируется": 0.5,
+      "не хочет идти в школу": 0.4,
+    },
+    description:
+      "Слабость произвольной регуляции поведения — трудности с подчинением правилам, планированием и контролем импульсивных реакций.",
+    everydayImpact:
+      "Ребёнку трудно соблюдать правила и инструкции, он действует импульсивно, «первым порывом». Ему сложно дождаться своей очереди, довести дело до конца, переключиться с приятного на нужное. Истерики и агрессия часто становятся единственным доступным способом справиться с ситуациями, где требуются регуляторные навыки, которых пока нет. В школе это проявляется как нарушения дисциплины, конфликты, невыполнение заданий — не из вредности, а из-за объективной невозможности регулировать себя.",
+    luriaExplanation:
+      "Третий функциональный блок мозга по А.Р. Лурия — блок программирования, регуляции и контроля — расположен в префронтальных (лобных) отделах коры. Именно он обеспечивает планирование последовательности действий, подчинение поведения правилам, подавление импульсивных реакций и целенаправленный контроль результатов. По Л.С. Выготскому, произвольная регуляция формируется через культурные средства — речь, правила, образцы поведения — сначала во внешнем плане (взрослый направляет), потом интериоризируется. Когда этот блок незрел, внешние средства регуляции ещё не стали внутренними, и ребёнок зависит от ситуации, а не от собственной программы действий.",
+  },
+  {
+    id: "voluntary-attention-deficit",
+    name: "Синдром дефицита произвольного внимания",
+    block: 3,
+    symptomWeights: {
+      "плохо концентрируется": 1.0,
+      "не запоминает": 0.5,
+      "трудно сидеть на месте": 0.4,
+    },
+    description:
+      "Неспособность к целенаправленному удержанию внимания на задаче — легко отвлекается, «улетает», не может завершить начатое.",
+    everydayImpact:
+      "Ребёнок легко отвлекается на любые внешние стимулы и собственные мысли. Начинает дело, но через несколько минут переключается на другое. Не может дослушать инструкцию до конца, «теряет нить» в разговоре. При этом непроизвольное внимание (на то, что ярко, ново, интересно) может быть в норме — проблема именно в произвольном, волевом сосредоточении. Трудности с запоминанием часто вторичны — информация просто не «записывается», потому что не была воспринята достаточно внимательно.",
+    luriaExplanation:
+      "Произвольное внимание — это способность целенаправленно сосредоточиться на задаче, игнорируя отвлекающие факторы. По А.Р. Лурия, оно обеспечивается совместной работой первого (энергетического) и третьего (регуляторного) блоков мозга: первый даёт тонус, третий — направление и контроль. При слабости этой системы преобладает непроизвольное внимание — ребёнок реагирует на всё яркое и новое, но не может удержать объект по собственной воле. По Выготскому, произвольное внимание развивается через внешние опоры: напоминания взрослого, визуальные подсказки, совместное выполнение задач. Постепенно эти внешние средства становятся внутренними, и ребёнок обретает способность к саморегуляции внимания.",
+  },
+  {
+    id: "visuospatial-difficulties",
+    name: "Синдром зрительно-пространственных трудностей",
+    block: 2,
+    symptomWeights: {
+      "плохо пишет": 1.0,
+      "плохо читает": 0.5,
+    },
+    description:
+      "Слабость зрительно-пространственного анализа и синтеза — трудности с ориентировкой в пространстве, письмом, различением похожих зрительных образов.",
+    everydayImpact:
+      "Ребёнок путает похожие буквы (б-д, ш-щ, п-н), «зеркалит» написание, не соблюдает строку и наклон при письме. Трудно копировать с доски, ориентироваться на листе бумаги, понимать пространственные предлоги (в, на, под, за). Может быть неловок в бытовых пространственных задачах — завязывание шнурков, застёгивание пуговиц, сборка конструктора по образцу. При чтении теряет строку, перескакивает через слова.",
+    luriaExplanation:
+      "Второй функциональный блок мозга по А.Р. Лурия — блок приёма, переработки и хранения информации — включает затылочные, теменные и височные области коры. Зрительно-пространственные функции опираются прежде всего на теменно-затылочные отделы, особенно правого полушария. Когда эта зона незрел, страдает анализ пространственных отношений: ребёнку трудно оценить расстояние, направление, пропорции — всё, что необходимо для ориентировки на листе бумаги, соблюдения строки при письме, различения пространственно сходных букв. В нейропсихологии такие трудности описаны как синдром слабости зрительно-пространственных функций (Т.В. Ахутина, Н.К. Корсакова).",
+  },
+  {
+    id: "auditory-processing-difficulties",
+    name: "Синдром трудностей слуховой переработки",
+    block: 2,
+    symptomWeights: {
+      "есть сложности с речью": 1.0,
+      "плохо читает": 0.7,
+      "не запоминает": 0.4,
+    },
+    description:
+      "Слабость фонематического слуха и слухового анализа — трудности с различением звуков речи, звуко-буквенным анализом, слуховой памятью.",
+    everydayImpact:
+      "Ребёнок путает близкие по звучанию звуки (с-з, ш-щ, б-п, д-т), заменяет их в речи и на письме. Ему трудно выделить первый и последний звук в слове, разделить слово на слоги. Чтение идёт медленно, с ошибками — ребёнок не может «собрать» слово из звуков. Ухудшено запоминание вербальной информации — инструкций, стихов, пересказов. При этом зрение и интеллект могут быть в норме — проблема именно в слуховой переработке речевой информации.",
+    luriaExplanation:
+      "Слуховая переработка речи опирается на височные области левого полушария — зону Вернике и прилегающие участки коры, входящие во второй функциональный блок по А.Р. Лурия. Именно здесь осуществляется фонематический анализ — различение звуков речи, выделение значимых звуковых признаков. Когда эта система работает с трудностями, страдает не только восприятие речи на слух, но и речевое производство, и чтение (которое опирается на звуко-буквенный анализ), и вербальная память. Речевые трудности могут быть как следствием слабости слуховой переработки, так и её причиной — взаимосвязь двусторонняя. В нейропсихологической традиции такие трудности описываются как синдром слабости слуховых функций (Т.В. Ахутина, Ж.М. Глозман).",
+  },
+  {
+    id: "memory-difficulties",
+    name: "Синдром мнестических трудностей",
+    block: 2,
+    symptomWeights: {
+      "не запоминает": 1.0,
+      "плохо читает": 0.4,
+    },
+    description:
+      "Слабость мнемонических функций — трудности с запоминанием, удержанием и воспроизведением информации при сохранном интеллекте.",
+    everydayImpact:
+      "Ребёнок заучивает стихотворение или правило, но на следующий день не может воспроизвести. Забывает поручения взрослых, теряет нить рассказа. Трудно запомнить таблицу умножения, иностранные слова, даты. При этом может хорошо помнить то, что связано с яркими эмоциями или личным опытом — проблема в запоминании «нейтральной» информации, требующей произвольной организации. Трудности с чтением часто вторичны — плохо запоминается содержание прочитанного.",
+    luriaExplanation:
+      "Память — одна из ключевых функций второго функционального блока по А.Р. Лурия, однако мнестические процессы обеспечиваются взаимодействием всех трёх блоков: первый даёт тонус, второй обеспечивает модально-специфическое запечатление, третий — произвольную организацию мнемонической деятельности. По Л.С. Выготскому, высшие формы памяти — это культурно опосредствованные функции: запоминание с помощью карточек, узелков, схем, ассоциаций. Когда мнемонические стратегии не сформированы, ребёнок запоминает механически, без организации материала, и быстро теряет усвоенное. В нейропсихологии мнестические трудности рассматриваются как синдром, который может быть первичным (собственно слабость памяти) или вторичным — следствием энергодефицита, слабости внимания или несформированности регуляторных функций (Т.В. Ахутина, Н.К. Корсакова).",
+  },
+  {
+    id: "emotional-dysregulation",
+    name: "Синдром эмоциональной дисрегуляции",
+    block: 3,
+    symptomWeights: {
+      "тревожится": 1.0,
+      "истерики": 0.8,
+      "агрессия": 0.7,
+      "плохо засыпает": 0.5,
+      "не хочет идти в школу": 0.5,
+    },
+    description:
+      "Нарушение регуляции эмоциональных состояний — интенсивные эмоции, с которыми ребёнок не может справиться самостоятельно.",
+    everydayImpact:
+      "Ребёнок испытывает интенсивные тревогу, страх, гнев, которые «захлёстывают» его. Истерики возникают внезапно и длятся долго. Агрессия — не осознанный выбор, а реакция на эмоциональную перегрузку. Плохой сон связан с невозможностью «отключить» тревожные мысли. Отказ от школы — избегание ситуации, которая вызывает непереносимую эмоциональную нагрузку. При этом в спокойном состоянии ребёнок может быть вполне разумным и контактным — проблема именно в регуляции эмоций, а не в их отсутствии.",
+    luriaExplanation:
+      "Эмоциональная регуляция — сложная функция, в которую вовлечены все три функциональных блока мозга по А.Р. Лурия: первый блок (активация лимбической системы и ретикулярной формации задаёт эмоциональный тонус), второй (переработка эмоционально значимой информации, оценка сигналов угрозы) и третий (произвольный контроль эмоциональных реакций, осуществляемый префронтальной корой). Когда эта система не сбалансирована, возникает эмоциональная дисрегуляция — интенсивные эмоции, которые «пробивают» ещё незрелые механизмы контроля. По Л.С. Выготскому, эмоциональная саморегуляция, как и другие высшие психические функции, формируется сначала во внешнем плане — через поддержку взрослого, называние эмоций, совместное проживание трудных моментов — и лишь постепенно становится внутренним навыком. Истерики и агрессия — не «плохое поведение», а сигнал о том, что эмоциональная нагрузка превышает возможности регуляции.",
+  },
+];
+
+const BLOCK_WEIGHTS: Record<number, Record<string, number>> = {
+  1: {
+    "быстро устаёт": 1.0,
+    "плохо засыпает": 0.7,
+    "трудно сидеть на месте": 0.2,
+  },
+  2: {
+    "плохо читает": 0.7,
+    "плохо пишет": 0.9,
+    "не запоминает": 0.8,
+    "есть сложности с речью": 0.8,
+  },
+  3: {
+    "плохо концентрируется": 0.9,
+    "трудно сидеть на месте": 0.7,
+    "истерики": 0.6,
+    "агрессия": 0.5,
+    "тревожится": 0.5,
+    "не хочет идти в школу": 0.4,
+    "плохо засыпает": 0.2,
+  },
+};
+
+const BLOCK_LABELS: Record<number, string> = {
+  1: "Энергетический блок (бодрствование и ресурс)",
+  2: "Блок переработки информации (восприятие, память, речь)",
+  3: "Блок программирования и регуляции (управление поведением)",
+};
+
+function getFrequency(concern: string, frequencies: Record<string, ConcernFrequency>): ConcernFrequency {
+  return frequencies[concern] ?? "иногда";
+}
+
+function calculateBlockScore(
+  block: number,
+  concerns: string[],
+  frequencies: Record<string, ConcernFrequency>
+): { score: number; maxScore: number } {
+  const weights = BLOCK_WEIGHTS[block] ?? {};
+  let score = 0;
+  let maxScore = 0;
+
+  for (const [concern, weight] of Object.entries(weights)) {
+    maxScore += weight * 3;
+    if (concerns.includes(concern)) {
+      const freq = getFrequency(concern, frequencies);
+      score += weight * FREQUENCY_MULTIPLIER[freq];
+    }
+  }
+
+  return { score: Math.round(score * 100) / 100, maxScore: Math.round(maxScore * 100) / 100 };
+}
+
+function getBlockStatus(ratio: number): string {
+  if (ratio >= 0.65) return "слабый";
+  if (ratio >= 0.4) return "ослаблен";
+  if (ratio >= 0.2) return "норма";
+  return "сильный";
+}
+
+function calculateNeuropsychProfile(
+  concerns: string[],
+  frequencies: Record<string, ConcernFrequency>
+): NeuropsychProfile {
+  const block1 = calculateBlockScore(1, concerns, frequencies);
+  const block2 = calculateBlockScore(2, concerns, frequencies);
+  const block3 = calculateBlockScore(3, concerns, frequencies);
+
+  return {
+    block1: {
+      label: BLOCK_LABELS[1],
+      score: block1.score,
+      maxScore: block1.maxScore,
+      status: getBlockStatus(block1.maxScore > 0 ? block1.score / block1.maxScore : 0),
+    },
+    block2: {
+      label: BLOCK_LABELS[2],
+      score: block2.score,
+      maxScore: block2.maxScore,
+      status: getBlockStatus(block2.maxScore > 0 ? block2.score / block2.maxScore : 0),
+    },
+    block3: {
+      label: BLOCK_LABELS[3],
+      score: block3.score,
+      maxScore: block3.maxScore,
+      status: getBlockStatus(block3.maxScore > 0 ? block3.score / block3.maxScore : 0),
+    },
+  };
+}
+
+function detectSyndromes(
+  concerns: string[],
+  frequencies: Record<string, ConcernFrequency>
+): SyndromeDetection[] {
+  const detected: SyndromeDetection[] = [];
+
+  for (const rule of SYNDROME_RULES) {
+    const matchedSymptoms: string[] = [];
+    let rawScore = 0;
+    let maxPossible = 0;
+    let hasFrequentSymptom = false;
+
+    for (const [symptom, weight] of Object.entries(rule.symptomWeights)) {
+      maxPossible += weight * 3;
+      if (concerns.includes(symptom)) {
+        const freq = getFrequency(symptom, frequencies);
+        rawScore += weight * FREQUENCY_MULTIPLIER[freq];
+        matchedSymptoms.push(symptom);
+        if (freq === "часто") hasFrequentSymptom = true;
+      }
+    }
+
+    const ratio = maxPossible > 0 ? rawScore / maxPossible : 0;
+
+    const meetsThreshold = ratio >= 0.25;
+    const hasMinimumSymptoms = matchedSymptoms.length >= 2 || (matchedSymptoms.length >= 1 && hasFrequentSymptom);
+
+    if (!meetsThreshold || !hasMinimumSymptoms) continue;
+
+    let severity: "выраженный" | "умеренный" | "мягкий";
+    if (ratio >= 0.65) {
+      severity = "выраженный";
+    } else if (ratio >= 0.4) {
+      severity = "умеренный";
+    } else {
+      severity = "мягкий";
+    }
+
+    const fullDescription = `${rule.luriaExplanation}\n\nКак это выглядит в жизни: ${rule.everydayImpact}`;
+
+    detected.push({
+      name: rule.name,
+      block: rule.block,
+      description: fullDescription,
+      severity,
+      matchedSymptoms,
+    });
+  }
+
+  detected.sort((a, b) => {
+    const severityOrder: Record<string, number> = { "выраженный": 3, "умеренный": 2, "мягкий": 1 };
+    return severityOrder[b.severity] - severityOrder[a.severity];
+  });
+
+  return detected;
+}
+
+function buildNeuropsychProfileSection(
+  concerns: string[],
+  frequencies: Record<string, ConcernFrequency>
+): NeuropsychProfileSection {
+  const profile = calculateNeuropsychProfile(concerns, frequencies);
+  const hasAnyConcern = concerns.length > 0;
+
+  return {
+    title: "Нейропсихологический профиль",
+    intro: hasAnyConcern
+      ? "Ниже представлен профиль по трём функциональным блокам мозга по теории А.Р. Лурия. Каждый блок отвечает за определённый аспект работы нервной системы. Статус показывает, насколько данный блок справляется со своей задачей на основе ваших ответов."
+      : "У вас нет выраженных опасений — все три функциональных блока мозга по теории А.Р. Лурия выглядят благополучно. Это хорошая основа для дальнейшего развития.",
+    profile,
+  };
+}
+
+function buildSyndromesSection(
+  concerns: string[],
+  frequencies: Record<string, ConcernFrequency>
+): SyndromesSection {
+  const syndromes = detectSyndromes(concerns, frequencies);
+
+  return {
+    title: "Выявленные синдромы",
+    intro:
+      syndromes.length > 0
+        ? "На основе ваших ответов выявлены следующие нейропсихологические синдромы — устойчивые комбинации симптомов, указывающие на слабость определённых функциональных систем. Важно понимать: синдром — это не диагноз, а паттерн, который помогает понять, какая поддержка нужна ребёнку."
+        : "На основе ваших ответов не выявлено выраженных нейропсихологических синдромов. Это говорит о том, что развитие ребёнка идёт без значимых отклонений в исследованных сферах.",
+    syndromes,
+  };
+}
+
 function buildStrengthsSection(strengths: string[]): ScreeningReport["strengthsSection"] {
   const items = strengths
     .filter((s) => STRENGTH_DESCRIPTIONS[s])
@@ -757,7 +1101,8 @@ function buildMaterials(concerns: string[]): ScreeningReport["materialsSection"]
 }
 
 function buildSpecialistRecommendation(
-  concerns: string[]
+  concerns: string[],
+  syndromes: SyndromeDetection[]
 ): SpecialistRecommendation {
   const has = (c: string) => concerns.includes(c);
 
@@ -775,13 +1120,18 @@ function buildSpecialistRecommendation(
 
   const speechRisk = has("есть сложности с речью") && concerns.length >= 2;
 
+  const hasSevereSyndrome = syndromes.some((s) => s.severity === "выраженный");
+  const hasMultipleModerate = syndromes.filter((s) => s.severity === "умеренный").length >= 2;
+
   const show =
     concerns.length >= 4 ||
     adhdTriad ||
     learningRisk ||
     anxietyCluster ||
     aggressionCluster ||
-    speechRisk;
+    speechRisk ||
+    hasSevereSyndrome ||
+    hasMultipleModerate;
 
   if (!show) {
     return { show: false, title: "", text: "", urgency: "normal" };
@@ -790,7 +1140,8 @@ function buildSpecialistRecommendation(
   const high =
     concerns.length >= 6 ||
     (adhdTriad && anxietyCluster) ||
-    (aggressionCluster && concerns.length >= 4);
+    (aggressionCluster && concerns.length >= 4) ||
+    hasSevereSyndrome;
 
   const urgency: "normal" | "high" = high ? "high" : "normal";
 
@@ -811,15 +1162,21 @@ function buildSpecialistRecommendation(
 export function generateReport(
   childAge: string,
   concerns: string[],
+  concernFrequencies: Record<string, ConcernFrequency>,
   strengths: string[]
 ): ScreeningReport {
   const age = childAge as AgeGroup;
+  const frequencies = concernFrequencies;
+
+  const syndromesSection = buildSyndromesSection(concerns, frequencies);
 
   return {
+    neuropsychProfile: buildNeuropsychProfileSection(concerns, frequencies),
     strengthsSection: buildStrengthsSection(strengths),
+    syndromes: syndromesSection,
     concernsSection: buildConcernsSection(concerns),
     homeActivitiesSection: buildHomeActivities(concerns, age),
     materialsSection: buildMaterials(concerns),
-    specialistRecommendation: buildSpecialistRecommendation(concerns),
+    specialistRecommendation: buildSpecialistRecommendation(concerns, syndromesSection.syndromes),
   };
 }
