@@ -19,6 +19,7 @@ model User {
   screeningResults   ScreeningResult[]
   bookings           Booking[]
   consultationReqs   ConsultationRequest[]
+  payments           Payment[]
 }
 
 model Service {
@@ -34,16 +35,18 @@ model Service {
 }
 
 model Article {
-  id          String   @id @default(cuid())
-  title       String
-  slug        String   @unique
-  excerpt     String
-  content     String
-  category    String?
-  image       String?
-  isPublished Boolean  @default(false)
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+  id            String   @id @default(cuid())
+  title         String
+  slug          String   @unique
+  excerpt       String
+  content       String
+  category      String?
+  image         String?
+  isPublished   Boolean  @default(false)
+  source        String?
+  externalUrl   String?
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
 }
 
 model Course {
@@ -62,13 +65,16 @@ model Course {
 }
 
 model Testimonial {
-  id        String   @id @default(cuid())
-  author    String
-  text      String
-  rating    Int      @default(5)
-  order     Int      @default(0)
-  isActive  Boolean  @default(true)
-  createdAt DateTime @default(now())
+  id          String   @id @default(cuid())
+  author      String
+  text        String
+  rating      Int      @default(5)
+  order       Int      @default(0)
+  isActive    Boolean  @default(true)
+  source      String?
+  sourceUrl   String?
+  sourceAvatar String?
+  createdAt   DateTime @default(now())
 }
 
 model ScheduleSlot {
@@ -101,21 +107,21 @@ model Booking {
 }
 
 model ScreeningResult {
-  id           String   @id @default(cuid())
-  userId       String?
-  childAge     String
+  id                  String   @id @default(cuid())
+  userId              String?
+  childAge            String
   concerns            String
   concernFrequencies  String?
   strengths           String
   report              String
-  completed    Boolean  @default(false)
-  parentName   String?
-  parentPhone  String?
-  parentEmail  String?
-  messenger    String?
-  createdAt    DateTime @default(now())
+  completed           Boolean  @default(false)
+  parentName          String?
+  parentPhone         String?
+  parentEmail         String?
+  messenger           String?
+  createdAt           DateTime @default(now())
 
-  user         User?    @relation(fields: [userId], references: [id])
+  user                User?    @relation(fields: [userId], references: [id])
 }
 
 model ConsultationRequest {
@@ -136,4 +142,36 @@ model SiteStat {
   date      String
   visits    Int      @default(0)
   createdAt DateTime @default(now())
+}
+
+model Setting {
+  id        String   @id @default(cuid())
+  key       String   @unique
+  value     String
+  updatedAt DateTime @updatedAt
+}
+
+model Payment {
+  id          String   @id @default(cuid())
+  userId      String
+  courseId     String
+  amount      Float
+  status      String   @default("pending")
+  provider    String
+  providerId  String?
+  createdAt   DateTime @default(now())
+
+  user        User     @relation(fields: [userId], references: [id])
+}
+
+model ExternalReview {
+  id          String   @id @default(cuid())
+  source      String
+  author      String
+  text        String
+  rating      Int      @default(5)
+  sourceUrl   String?
+  sourceAvatar String?
+  sourceDate  String?
+  syncedAt    DateTime @default(now())
 }

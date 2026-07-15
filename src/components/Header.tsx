@@ -1,9 +1,11 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Link from "next/link";
-import { Brain, Menu, X, LogIn } from "lucide-react";
+import { Brain, Menu, X, LogIn, Send, ExternalLink } from "lucide-react";
 import { clsx } from "clsx";
+
+type Settings = Record<string, string>;
 
 const navLinks = [
   { href: "/about", label: "Обо мне" },
@@ -11,20 +13,26 @@ const navLinks = [
   { href: "/materials", label: "Материалы" },
   { href: "/courses", label: "Курсы" },
   { href: "/booking", label: "Записаться" },
-  { href: "/questionnaire", label: "Анкета" },
+  { href: "/screening", label: "Анкета" },
 ];
 
 export default function Header() {
   const [mobileOpen, setMobileOpen] = useState(false);
+  const [settings, setSettings] = useState<Settings>({});
+
+  useEffect(() => {
+    fetch("/api/admin/settings")
+      .then((r) => r.json())
+      .then((data) => setSettings(data))
+      .catch(() => {});
+  }, []);
 
   return (
     <header className="sticky top-0 z-50 border-b border-indigo-100 bg-white/80 backdrop-blur-md">
       <div className="mx-auto flex h-16 max-w-7xl items-center justify-between px-4 sm:px-6 lg:px-8">
         <Link href="/" className="flex items-center gap-2 text-xl font-bold text-indigo-700">
           <Brain className="h-7 w-7 text-indigo-600" />
-          <span>
-            Нейро
-          </span>
+          <span>Нейро</span>
         </Link>
 
         <nav className="hidden items-center gap-1 lg:flex">
@@ -39,7 +47,30 @@ export default function Header() {
           ))}
         </nav>
 
-        <div className="flex items-center gap-3">
+        <div className="flex items-center gap-2">
+          {settings.social_telegram && (
+            <a
+              href={settings.social_telegram}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="hidden items-center justify-center rounded-lg p-2 text-sky-500 transition-colors hover:bg-sky-50 sm:inline-flex"
+              aria-label="Telegram"
+            >
+              <Send className="h-5 w-5" />
+            </a>
+          )}
+          {settings.social_instagram && (
+            <a
+              href={settings.social_instagram}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="hidden items-center justify-center rounded-lg p-2 text-pink-500 transition-colors hover:bg-pink-50 sm:inline-flex"
+              aria-label="Instagram"
+            >
+              <ExternalLink className="h-5 w-5" />
+            </a>
+          )}
+
           <Link
             href="/auth/login"
             className="hidden items-center gap-2 rounded-lg bg-indigo-600 px-4 py-2 text-sm font-semibold text-white transition-colors hover:bg-indigo-700 sm:inline-flex"
@@ -76,6 +107,30 @@ export default function Header() {
               {label}
             </Link>
           ))}
+          <div className="flex items-center gap-2 pt-2">
+            {settings.social_telegram && (
+              <a
+                href={settings.social_telegram}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex items-center justify-center rounded-lg p-2 text-sky-500 transition-colors hover:bg-sky-50"
+                aria-label="Telegram"
+              >
+                <Send className="h-5 w-5" />
+              </a>
+            )}
+            {settings.social_instagram && (
+              <a
+                href={settings.social_instagram}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex items-center justify-center rounded-lg p-2 text-pink-500 transition-colors hover:bg-pink-50"
+                aria-label="Instagram"
+              >
+                <ExternalLink className="h-5 w-5" />
+              </a>
+            )}
+          </div>
           <Link
             href="/auth/login"
             className="mt-2 flex items-center gap-2 rounded-lg bg-indigo-600 px-3 py-2 text-sm font-semibold text-white transition-colors hover:bg-indigo-700"

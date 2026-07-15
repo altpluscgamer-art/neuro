@@ -10,6 +10,7 @@ import {
   FileText,
   ClipboardList,
   MessageSquare,
+  Settings,
   Users,
   LogOut,
   Menu,
@@ -23,7 +24,9 @@ const navItems = [
   { href: "/admin/content", label: "Контент", icon: FileText },
   { href: "/admin/screening-results", label: "Результаты анкет", icon: ClipboardList },
   { href: "/admin/consultation-requests", label: "Запросы", icon: MessageSquare },
+  { href: "/admin/settings", label: "Настройки", icon: Settings },
   { href: "/admin/users", label: "Пользователи", icon: Users },
+  { href: "/admin/settings", label: "Настройки", icon: Settings },
 ];
 
 export default function AdminLayout({ children }: { children: React.ReactNode }) {

@@ -139,15 +139,76 @@ export async function POST() {
     });
   }
 
+  const settingCount = await prisma.setting.count();
+  if (settingCount === 0) {
+    await prisma.setting.createMany({
+      data: [
+        { key: "site_phone", value: "+7 (999) 000-00-00" },
+        { key: "site_email", value: "info@neuro.ru" },
+        { key: "social_telegram", value: "https://t.me/neuro_platform" },
+        { key: "social_instagram", value: "https://instagram.com/neuro_platform" },
+        { key: "social_whatsapp", value: "https://wa.me/79990000000" },
+        { key: "metrica_enabled", value: "false" },
+        { key: "yookassa_test_mode", value: "true" },
+        { key: "telegram_auto_sync", value: "false" },
+        { key: "reviews_auto_sync", value: "false" },
+        { key: "ads_yandex_enabled", value: "false" },
+        { key: "ads_google_enabled", value: "false" },
+      ],
+    });
+  }
+
+  const externalReviewCount = await prisma.externalReview.count();
+  if (externalReviewCount === 0) {
+    await prisma.externalReview.createMany({
+      data: [
+        {
+          source: "yandex",
+          author: "Ольга Д.",
+          text: "Очень благодарны за диагностику! Наконец-то поняли, почему ребёнку трудно даётся письмо. Рекомендации конкретные и выполнимые.",
+          rating: 5,
+          sourceUrl: "https://yandex.ru/maps/org/neuro/reviews/1",
+          sourceDate: "2026-05-10",
+        },
+        {
+          source: "yandex",
+          author: "Светлана М.",
+          text: "Ходим на нейрокоррекцию уже третий месяц — результаты налицо. Дочь стала спокойнее и усидчивее.",
+          rating: 5,
+          sourceUrl: "https://yandex.ru/maps/org/neuro/reviews/2",
+          sourceDate: "2026-04-22",
+        },
+        {
+          source: "google",
+          author: "Игорь К.",
+          text: "Профессиональный подход и живой интерес к ребёнку. Видно, что специалист любит своё дело.",
+          rating: 5,
+          sourceUrl: "https://google.com/maps/reviews/3",
+          sourceDate: "2026-03-15",
+        },
+        {
+          source: "google",
+          author: "Наталья В.",
+          text: "Консультация превзошла ожидания — получили не абстрактные советы, а чёткий план действий с упражнениями.",
+          rating: 4,
+          sourceUrl: "https://google.com/maps/reviews/4",
+          sourceDate: "2026-02-28",
+        },
+      ],
+    });
+  }
+
   const users = await prisma.user.count();
   const services = await prisma.service.count();
   const articles = await prisma.article.count();
   const courses = await prisma.course.count();
   const testimonials = await prisma.testimonial.count();
   const slots = await prisma.scheduleSlot.count();
+  const settings = await prisma.setting.count();
+  const externalReviews = await prisma.externalReview.count();
 
   return NextResponse.json({
     message: "Seed completed",
-    counts: { users, services, articles, courses, testimonials, slots },
+    counts: { users, services, articles, courses, testimonials, slots, settings, externalReviews },
   });
 }

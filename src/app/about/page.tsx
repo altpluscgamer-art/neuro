@@ -1,6 +1,8 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import SEOHead from "@/components/SEOHead";
+import ExternalReviews from "@/components/ExternalReviews";
+import { getAllSettings } from "@/lib/settings";
 import {
   GraduationCap,
   Award,
@@ -10,6 +12,11 @@ import {
   Users,
   ArrowRight,
   BookOpen,
+  Send,
+  ExternalLink,
+  MessageCircle,
+  Share2,
+  PlayCircle,
 } from "lucide-react";
 
 export const metadata: Metadata = {
@@ -66,7 +73,18 @@ const placeholderTestimonials = [
   },
 ];
 
-export default function AboutPage() {
+const socialKeys = [
+  { key: "social_instagram", icon: ExternalLink, label: "Instagram" },
+  { key: "social_telegram", icon: Send, label: "Telegram" },
+  { key: "social_whatsapp", icon: MessageCircle, label: "WhatsApp" },
+  { key: "social_vk", icon: Share2, label: "VK" },
+  { key: "social_youtube", icon: PlayCircle, label: "YouTube" },
+] as const;
+
+export default async function AboutPage() {
+  const settings = await getAllSettings();
+  const activeSocials = socialKeys.filter((s) => settings[s.key]);
+
   return (
     <>
       <SEOHead
@@ -265,8 +283,47 @@ export default function AboutPage() {
               </div>
             ))}
           </div>
+
+          <div className="mt-12">
+            <div className="mb-8 text-center">
+              <h3 className="text-2xl font-bold tracking-tight text-primary-950">
+                Отзывы из внешних источников
+              </h3>
+              <p className="mt-2 text-base text-gray-600">
+                Яндекс, Google и другие площадки
+              </p>
+            </div>
+            <ExternalReviews />
+          </div>
         </div>
       </section>
+
+      {activeSocials.length > 0 && (
+        <section className="bg-primary-50/50 py-16 sm:py-20">
+          <div className="mx-auto max-w-4xl px-4 text-center sm:px-6 lg:px-8">
+            <h2 className="text-2xl font-bold tracking-tight text-primary-950 sm:text-3xl">
+              Мы в социальных сетях
+            </h2>
+            <p className="mt-3 text-base text-gray-600">
+              Подписывайтесь, чтобы получать полезные материалы и новости
+            </p>
+            <div className="mt-8 flex flex-wrap items-center justify-center gap-4">
+              {activeSocials.map((s) => (
+                <a
+                  key={s.key}
+                  href={settings[s.key]}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="inline-flex items-center gap-2 rounded-xl border border-gray-200 bg-white px-5 py-3 text-sm font-semibold text-gray-700 shadow-sm transition-colors hover:border-indigo-300 hover:text-indigo-700"
+                >
+                  <s.icon className="h-5 w-5" />
+                  {s.label}
+                </a>
+              ))}
+            </div>
+          </div>
+        </section>
+      )}
 
       <section className="bg-gradient-to-br from-primary-600 to-primary-800 py-20 sm:py-28">
         <div className="mx-auto max-w-4xl px-4 text-center sm:px-6 lg:px-8">
