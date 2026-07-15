@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Link from "next/link";
 import { useForm } from "react-hook-form";
 import {
@@ -170,12 +170,17 @@ function getBarStyle(score: number, maxScore: number) {
 }
 
 export default function ScreeningPage() {
+  const [mounted, setMounted] = useState(false);
   const [step, setStep] = useState(0);
   const [report, setReport] = useState<ScreeningReport | null>(null);
   const [reportId, setReportId] = useState("");
   const [submitting, setSubmitting] = useState(false);
   const [fade, setFade] = useState(false);
   const [submitError, setSubmitError] = useState("");
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
 
   const {
     watch,
@@ -431,6 +436,7 @@ export default function ScreeningPage() {
         type="button"
         onClick={() => transitionTo(1)}
         className="inline-flex items-center gap-2 rounded-xl bg-primary-600 px-8 py-3 text-base font-semibold text-white shadow-md shadow-primary-200 transition-colors hover:bg-primary-700 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2"
+        style={{ touchAction: "manipulation", minHeight: "48px" }}
       >
         Начать
         <ChevronRight className="h-5 w-5" />
@@ -461,6 +467,7 @@ export default function ScreeningPage() {
                   ? "border-primary-500 bg-primary-50 text-primary-700 shadow-sm"
                   : "border-gray-200 bg-white text-gray-700 hover:border-primary-300 hover:bg-primary-50/50"
               )}
+              style={{ touchAction: "manipulation", minHeight: "48px" }}
             >
               {opt.label}
               {selected && (
@@ -1124,6 +1131,14 @@ export default function ScreeningPage() {
     }
   };
 
+  if (!mounted) {
+    return (
+      <div className="flex min-h-[60vh] items-center justify-center">
+        <div className="h-8 w-8 animate-spin rounded-full border-4 border-indigo-200 border-t-indigo-600" />
+      </div>
+    );
+  }
+
   return (
     <div className="min-h-screen bg-gradient-to-b from-primary-50 via-white to-white">
       <div className="mx-auto max-w-2xl px-4 py-8 sm:py-12">
@@ -1148,6 +1163,7 @@ export default function ScreeningPage() {
                   type="button"
                   onClick={handleBack}
                   className="inline-flex items-center gap-1.5 rounded-lg px-4 py-2 text-sm font-medium text-gray-600 transition-colors hover:bg-gray-100 hover:text-gray-900"
+                  style={{ touchAction: "manipulation", minHeight: "44px" }}
                 >
                   <ChevronLeft className="h-4 w-4" />
                   Назад
@@ -1166,6 +1182,7 @@ export default function ScreeningPage() {
                     ? "cursor-not-allowed bg-primary-300 text-white"
                     : "bg-primary-600 text-white hover:bg-primary-700"
                 )}
+                style={{ touchAction: "manipulation", minHeight: "44px" }}
               >
                 {submitting ? (
                   <>

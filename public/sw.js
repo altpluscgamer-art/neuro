@@ -1,14 +1,16 @@
-const STATIC_CACHE = "neuro-static-v1";
-const DYNAMIC_CACHE = "neuro-dynamic-v1";
+const CACHE_VERSION = "neuro-v2";
+const STATIC_CACHE = `${CACHE_VERSION}-static`;
+const DYNAMIC_CACHE = `${CACHE_VERSION}-dynamic`;
 
-const STATIC_ASSETS = ["/", "/manifest.json", "/icon-192.png", "/icon-512.png"];
+const STATIC_ASSETS = ["/", "/manifest.json"];
 
 self.addEventListener("install", (event) => {
+  self.skipWaiting();
   event.waitUntil(
     caches
       .open(STATIC_CACHE)
       .then((cache) => cache.addAll(STATIC_ASSETS))
-      .then(() => self.skipWaiting())
+      .catch(() => {})
   );
 });
 
@@ -19,10 +21,7 @@ self.addEventListener("activate", (event) => {
       .then((keys) =>
         Promise.all(
           keys
-            .filter(
-              (key) =>
-                key !== STATIC_CACHE && key !== DYNAMIC_CACHE
-            )
+            .filter((key) => !key.startsWith(CACHE_VERSION))
             .map((key) => caches.delete(key))
         )
       )
@@ -35,46 +34,30 @@ self.addEventListener("fetch", (event) => {
   const url = new URL(request.url);
 
   if (request.method !== "GET") return;
-
   if (url.origin !== location.origin) return;
 
-  if (isStaticAsset(url.pathname)) {
-    event.respondWith(cacheFirst(request));
+  if (url.pathname.startsWith("/_next/")) {
+    event.respondWith(staleWhileRevalidate(request));
     return;
   }
 
-  if (isApiRequest(url.pathname)) {
-    event.respondWith(networkFirst(request));
+  if (url.pathname.startsWith("/api/")) {
     return;
   }
 
   event.respondWith(networkFirst(request));
 });
 
-function isStaticAsset(pathname) {
-  return /\.(css|js|png|jpg|jpeg|gif|svg|ico|woff2?|ttf|eot)$/i.test(
-    pathname
-  );
-}
-
-function isApiRequest(pathname) {
-  return pathname.startsWith("/api/");
-}
-
-async function cacheFirst(request) {
+async function staleWhileRevalidate(request) {
   const cached = await caches.match(request);
-  if (cached) return cached;
-
-  try {
-    const response = await fetch(request);
+  const fetchPromise = fetch(request).then((response) => {
     if (response.ok) {
-      const cache = await caches.open(STATIC_CACHE);
-      cache.put(request, response.clone());
+      const cache = caches.open(STATIC_CACHE);
+      cache.then((c) => c.put(request, response.clone()));
     }
     return response;
-  } catch {
-    return offlineFallback(request);
-  }
+  }).catch(() => cached);
+  return cached || fetchPromise;
 }
 
 async function networkFirst(request) {
@@ -88,18 +71,6 @@ async function networkFirst(request) {
   } catch {
     const cached = await caches.match(request);
     if (cached) return cached;
-    return offlineFallback(request);
+    return new Response("Offline", { status: 503 });
   }
-}
-
-async function offlineFallback(request) {
-  if (request.headers.get("Accept")?.includes("text/html")) {
-    const cached = await caches.match("/");
-    if (cached) return cached;
-  }
-
-  return new Response("Offline", {
-    status: 503,
-    statusText: "Service Unavailable",
-  });
 }
