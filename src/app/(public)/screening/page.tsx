@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import Link from "next/link";
 import { useForm } from "react-hook-form";
 import {
@@ -170,17 +170,12 @@ function getBarStyle(score: number, maxScore: number) {
 }
 
 export default function ScreeningPage() {
-  const [mounted, setMounted] = useState(false);
   const [step, setStep] = useState(0);
   const [report, setReport] = useState<ScreeningReport | null>(null);
   const [reportId, setReportId] = useState("");
   const [submitting, setSubmitting] = useState(false);
   const [fade, setFade] = useState(false);
   const [submitError, setSubmitError] = useState("");
-
-  useEffect(() => {
-    setMounted(true);
-  }, []);
 
   const {
     watch,
@@ -1130,14 +1125,6 @@ export default function ScreeningPage() {
         return null;
     }
   };
-
-  if (!mounted) {
-    return (
-      <div className="flex min-h-[60vh] items-center justify-center">
-        <div className="h-8 w-8 animate-spin rounded-full border-4 border-indigo-200 border-t-indigo-600" />
-      </div>
-    );
-  }
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-primary-50 via-white to-white">

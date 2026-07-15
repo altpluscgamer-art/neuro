@@ -30,7 +30,7 @@ export const metadata: Metadata = {
     "онлайн курсы",
     "детская психология",
   ],
-  manifest: "/manifest.json",
+  manifest: undefined,
   openGraph: {
     type: "website",
     locale: "ru_RU",
@@ -68,6 +68,8 @@ export default function RootLayout({
     >
       <head>
         <meta name="theme-color" content="#6d28d9" />
+        <meta httpEquiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
+        <meta httpEquiv="Pragma" content="no-cache" />
       </head>
       <body className="flex min-h-full flex-col">
         {children}

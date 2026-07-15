@@ -4,8 +4,6 @@ import { useState, useEffect } from "react";
 import Link from "next/link";
 import { Brain, Menu, X, Send, ExternalLink } from "lucide-react";
 
-type Settings = Record<string, string>;
-
 const navLinks = [
   { href: "/about", label: "Обо мне" },
   { href: "/services", label: "Услуги" },
@@ -17,14 +15,20 @@ const navLinks = [
 
 export default function Header() {
   const [mobileOpen, setMobileOpen] = useState(false);
-  const [settings, setSettings] = useState<Settings>({});
-  const [mounted, setMounted] = useState(false);
+  const [socialLinks, setSocialLinks] = useState<{
+    telegram?: string;
+    instagram?: string;
+  }>({});
 
   useEffect(() => {
-    setMounted(true);
     fetch("/api/admin/settings")
       .then((r) => r.json())
-      .then((data) => setSettings(data))
+      .then((data) =>
+        setSocialLinks({
+          telegram: data.social_telegram,
+          instagram: data.social_instagram,
+        })
+      )
       .catch(() => {});
   }, []);
 
@@ -37,7 +41,6 @@ export default function Header() {
         <Link
           href="/"
           className="flex items-center gap-2 text-xl font-bold text-indigo-700"
-          style={{ touchAction: "manipulation" }}
         >
           <Brain className="h-7 w-7 text-indigo-600" />
           <span>Нейро</span>
@@ -56,23 +59,23 @@ export default function Header() {
         </nav>
 
         <div className="flex items-center gap-2">
-          {mounted && settings.social_telegram && (
+          {socialLinks.telegram && (
             <a
-              href={settings.social_telegram}
+              href={socialLinks.telegram}
               target="_blank"
               rel="noopener noreferrer"
-              className="hidden items-center justify-center rounded-lg p-2 text-sky-500 transition-colors hover:bg-sky-50 sm:inline-flex"
+              className="hidden items-center justify-center rounded-lg p-2.5 text-sky-500 transition-colors hover:bg-sky-50 sm:inline-flex"
               aria-label="Telegram"
             >
               <Send className="h-5 w-5" />
             </a>
           )}
-          {mounted && settings.social_instagram && (
+          {socialLinks.instagram && (
             <a
-              href={settings.social_instagram}
+              href={socialLinks.instagram}
               target="_blank"
               rel="noopener noreferrer"
-              className="hidden items-center justify-center rounded-lg p-2 text-pink-500 transition-colors hover:bg-pink-50 sm:inline-flex"
+              className="hidden items-center justify-center rounded-lg p-2.5 text-pink-500 transition-colors hover:bg-pink-50 sm:inline-flex"
               aria-label="Instagram"
             >
               <ExternalLink className="h-5 w-5" />
@@ -82,7 +85,11 @@ export default function Header() {
           <button
             type="button"
             className="inline-flex items-center justify-center rounded-lg p-2.5 text-gray-600 transition-colors hover:bg-indigo-50 hover:text-indigo-700 active:bg-indigo-100 lg:hidden"
-            onClick={() => setMobileOpen((v) => !v)}
+            onClick={(e) => {
+              e.preventDefault();
+              e.stopPropagation();
+              setMobileOpen((v) => !v);
+            }}
             aria-label={mobileOpen ? "Закрыть меню" : "Открыть меню"}
             aria-expanded={mobileOpen}
             style={{ touchAction: "manipulation", minHeight: "44px", minWidth: "44px" }}
@@ -93,10 +100,7 @@ export default function Header() {
       </div>
 
       {mobileOpen && (
-        <div
-          className="border-t border-indigo-100 bg-white lg:hidden"
-          style={{ touchAction: "manipulation" }}
-        >
+        <div className="border-t border-indigo-100 bg-white lg:hidden">
           <nav className="mx-auto max-w-7xl space-y-1 px-4 pb-4 pt-2 sm:px-6">
             {navLinks.map(({ href, label }) => (
               <Link
@@ -109,11 +113,11 @@ export default function Header() {
                 {label}
               </Link>
             ))}
-            {mounted && (settings.social_telegram || settings.social_instagram) && (
+            {(socialLinks.telegram || socialLinks.instagram) && (
               <div className="flex items-center gap-3 pt-3">
-                {settings.social_telegram && (
+                {socialLinks.telegram && (
                   <a
-                    href={settings.social_telegram}
+                    href={socialLinks.telegram}
                     target="_blank"
                     rel="noopener noreferrer"
                     className="inline-flex items-center justify-center rounded-lg p-2.5 text-sky-500 transition-colors hover:bg-sky-50"
@@ -122,9 +126,9 @@ export default function Header() {
                     <Send className="h-5 w-5" />
                   </a>
                 )}
-                {settings.social_instagram && (
+                {socialLinks.instagram && (
                   <a
-                    href={settings.social_instagram}
+                    href={socialLinks.instagram}
                     target="_blank"
                     rel="noopener noreferrer"
                     className="inline-flex items-center justify-center rounded-lg p-2.5 text-pink-500 transition-colors hover:bg-pink-50"

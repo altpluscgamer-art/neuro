@@ -52,7 +52,6 @@ const typeColors: Record<string, string> = {
 };
 
 export default function BookingPage() {
-  const [mounted, setMounted] = useState(false);
   const [slots, setSlots] = useState<Slot[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
@@ -70,7 +69,6 @@ export default function BookingPage() {
   });
 
   useEffect(() => {
-    setMounted(true);
     let cancelled = false;
 
     fetch("/api/admin/schedule")
@@ -173,14 +171,6 @@ export default function BookingPage() {
     } finally {
       setSubmitting(false);
     }
-  }
-
-  if (!mounted) {
-    return (
-      <div className="flex min-h-[60vh] items-center justify-center">
-        <div className="h-8 w-8 animate-spin rounded-full border-4 border-indigo-200 border-t-indigo-600" />
-      </div>
-    );
   }
 
   return (
