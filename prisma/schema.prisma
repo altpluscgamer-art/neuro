@@ -1,0 +1,134 @@
+generator client {
+  provider = "prisma-client"
+  output   = "../src/generated/prisma"
+}
+
+datasource db {
+  provider = "sqlite"
+}
+
+model User {
+  id        String   @id @default(cuid())
+  email     String   @unique
+  name      String
+  password  String
+  role      String   @default("parent")
+  phone     String?
+  createdAt DateTime @default(now())
+
+  screeningResults   ScreeningResult[]
+  bookings           Booking[]
+  consultationReqs   ConsultationRequest[]
+}
+
+model Service {
+  id          String   @id @default(cuid())
+  title       String
+  slug        String   @unique
+  description String
+  icon        String?
+  order       Int      @default(0)
+  isActive    Boolean  @default(true)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+model Article {
+  id          String   @id @default(cuid())
+  title       String
+  slug        String   @unique
+  excerpt     String
+  content     String
+  category    String?
+  image       String?
+  isPublished Boolean  @default(false)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+model Course {
+  id          String   @id @default(cuid())
+  title       String
+  slug        String   @unique
+  description String
+  excerpt     String
+  price       Float    @default(0)
+  videoUrl    String?
+  image       String?
+  lessons     Int      @default(1)
+  isPublished Boolean  @default(false)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+model Testimonial {
+  id        String   @id @default(cuid())
+  author    String
+  text      String
+  rating    Int      @default(5)
+  order     Int      @default(0)
+  isActive  Boolean  @default(true)
+  createdAt DateTime @default(now())
+}
+
+model ScheduleSlot {
+  id          String   @id @default(cuid())
+  date        String
+  timeStart   String
+  timeEnd     String
+  type        String
+  title       String
+  totalSeats  Int      @default(1)
+  bookedSeats Int      @default(0)
+  isActive    Boolean  @default(true)
+  createdAt   DateTime @default(now())
+
+  bookings Booking[]
+}
+
+model Booking {
+  id          String   @id @default(cuid())
+  userId      String
+  slotId      String
+  childName   String
+  childAge    Int
+  notes       String?
+  status      String   @default("pending")
+  createdAt   DateTime @default(now())
+
+  user        User         @relation(fields: [userId], references: [id])
+  slot        ScheduleSlot @relation(fields: [slotId], references: [id])
+}
+
+model ScreeningResult {
+  id           String   @id @default(cuid())
+  userId       String?
+  childAge     String
+  concerns     String
+  strengths    String
+  report       String
+  completed    Boolean  @default(false)
+  createdAt    DateTime @default(now())
+
+  user         User?    @relation(fields: [userId], references: [id])
+}
+
+model ConsultationRequest {
+  id        String   @id @default(cuid())
+  userId    String?
+  name      String
+  email     String
+  phone     String?
+  message   String
+  status    String   @default("new")
+  createdAt DateTime @default(now())
+
+  user      User?    @relation(fields: [userId], references: [id])
+}
+
+model SiteStat {
+  id        String   @id @default(cuid())
+  date      String
+  visits    Int      @default(0)
+  createdAt DateTime @default(now())
+}
