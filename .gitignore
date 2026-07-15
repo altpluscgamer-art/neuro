@@ -45,3 +45,12 @@ next-env.d.ts
 
 dev.db
 dev.db-journal
+
+# backups
+/backups/
+
+# temp scripts
+extract_pdf.py
+render_pdf.py
+pdf_page_*.png
+pdf_img_*.png
