@@ -11,6 +11,10 @@ import {
   Star,
   Users,
   Shield,
+  GraduationCap,
+  AlertCircle,
+  MessageCircle,
+  Activity,
   type LucideIcon,
 } from "lucide-react";
 
@@ -52,6 +56,56 @@ type TestimonialRow = {
   createdAt: Date;
 };
 
+const stats = [
+  { icon: Users, value: "1–13 лет", label: "возраст детей" },
+  { icon: Sparkles, value: "7 шагов", label: "в анкете-скрининге" },
+  { icon: Brain, value: "Методика А.Р. Лурии", label: "научный подход" },
+  { icon: Video, value: "Онлайн и очно", label: "формат работы" },
+];
+
+const problemCategories = [
+  {
+    icon: Brain,
+    title: "Внимание и память",
+    desc: "Трудности с концентрацией, удержанием информации и переключением внимания.",
+  },
+  {
+    icon: Heart,
+    title: "Поведение и эмоции",
+    desc: "Импульсивность, вспышки гнева и сложности с саморегуляцией.",
+  },
+  {
+    icon: GraduationCap,
+    title: "Адаптация к школе",
+    desc: "Трудности привыкания к школьным требованиям, режиму и нагрузке.",
+  },
+  {
+    icon: AlertCircle,
+    title: "Тревожность",
+    desc: "Повышенная тревога, страхи и школьная тревожность у ребёнка.",
+  },
+  {
+    icon: BookOpen,
+    title: "Трудности обучения",
+    desc: "Проблемы с чтением, письмом, счётом и усвоением учебного материала.",
+  },
+  {
+    icon: MessageCircle,
+    title: "Речевое развитие",
+    desc: "Задержка речи, бедный словарный запас и сложности с формулированием мыслей.",
+  },
+  {
+    icon: Activity,
+    title: "Моторное развитие",
+    desc: "Неловкость, проблемы с мелкой и крупной моторикой, координацией движений.",
+  },
+  {
+    icon: Shield,
+    title: "Задержки развития",
+    desc: "Отставание в развитии, требующее специального подхода и поддержки.",
+  },
+];
+
 export default async function HomePage() {
   const [services, testimonials]: [ServiceRow[], TestimonialRow[]] =
     await Promise.all([
@@ -68,7 +122,8 @@ export default async function HomePage() {
 
   return (
     <>
-      <section className="relative overflow-hidden bg-gradient-to-br from-primary-50 via-white to-accent-50">
+      {/* Hero */}
+      <section className="relative overflow-hidden bg-gradient-to-br from-primary-50 via-cream to-white">
         <div className="mx-auto max-w-7xl px-4 py-20 sm:px-6 sm:py-28 lg:px-8 lg:py-36">
           <div className="max-w-2xl">
             <div className="mb-6 inline-flex items-center gap-2 rounded-full bg-primary-100 px-4 py-1.5 text-sm font-medium text-primary-700">
@@ -82,8 +137,8 @@ export default async function HomePage() {
 
             <p className="mt-6 text-lg leading-relaxed text-gray-600 sm:text-xl">
               Научно обоснованные методики для диагностики и развития детей от 1
-              до 13 лет. Онлайн-консультации, курсы и материалы от
-              квалифицированного нейропсихолога.
+              до 13 лет. Помогаем выявить трудности и подобрать эффективный
+              путь развития&nbsp;&mdash; онлайн и очно.
             </p>
 
             <div className="mt-8 flex flex-col gap-4 sm:flex-row">
@@ -109,8 +164,29 @@ export default async function HomePage() {
         <div className="pointer-events-none absolute -bottom-20 left-1/3 h-72 w-72 rounded-full bg-accent-200/30 blur-3xl" />
       </section>
 
+      {/* Stats bar */}
+      <section className="bg-white py-12 sm:py-16">
+        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+          <div className="grid grid-cols-2 gap-4 sm:gap-6 lg:grid-cols-4">
+            {stats.map((s) => (
+              <div
+                key={s.label}
+                className="rounded-2xl border border-primary-100 bg-white p-5 text-center shadow-sm"
+              >
+                <s.icon className="mx-auto mb-3 h-7 w-7 text-primary-600" />
+                <p className="text-lg font-bold text-primary-950 sm:text-xl">
+                  {s.value}
+                </p>
+                <p className="mt-1 text-sm text-gray-500">{s.label}</p>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* Services */}
       {services.length > 0 && (
-        <section className="bg-white py-20 sm:py-28">
+        <section className="bg-cream py-20 sm:py-28">
           <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
             <div className="mb-12 text-center">
               <h2 className="text-3xl font-bold tracking-tight text-primary-950 sm:text-4xl">
@@ -125,9 +201,9 @@ export default async function HomePage() {
               {services.map((service) => (
                 <div
                   key={service.id}
-                  className="group rounded-2xl border border-gray-100 bg-white p-6 shadow-sm transition-shadow hover:shadow-md"
+                  className="group rounded-2xl border border-primary-100 bg-white p-6 shadow-sm transition-shadow hover:shadow-md"
                 >
-                  <div className="mb-4 inline-flex rounded-xl bg-primary-50 p-3">
+                  <div className="mb-4 inline-flex rounded-full bg-primary-50 p-3">
                     <ServiceIcon name={service.icon} />
                   </div>
                   <h3 className="mb-2 text-lg font-semibold text-primary-950">
@@ -150,6 +226,48 @@ export default async function HomePage() {
         </section>
       )}
 
+      {/* Problem categories */}
+      <section className="bg-white py-20 sm:py-28">
+        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+          <div className="mb-12 text-center">
+            <h2 className="text-3xl font-bold tracking-tight text-primary-950 sm:text-4xl">
+              С какими трудностями мы помогаем
+            </h2>
+            <p className="mt-4 text-lg text-gray-600">
+              Нейропсихологическая поддержка по ключевым направлениям развития
+            </p>
+          </div>
+
+          <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
+            {problemCategories.map((p) => (
+              <div
+                key={p.title}
+                className="rounded-2xl border border-primary-100 bg-white p-6 transition-colors hover:border-primary-300"
+              >
+                <p.icon className="mb-4 h-8 w-8 text-primary-600" />
+                <h3 className="mb-2 text-base font-semibold text-primary-950">
+                  {p.title}
+                </h3>
+                <p className="text-sm leading-relaxed text-gray-600">
+                  {p.desc}
+                </p>
+              </div>
+            ))}
+          </div>
+
+          <div className="mt-12 text-center">
+            <Link
+              href="/screening"
+              className="inline-flex items-center justify-center gap-2 rounded-xl bg-primary-600 px-6 py-3.5 text-base font-semibold text-white shadow-lg shadow-primary-600/25 transition-colors hover:bg-primary-700"
+            >
+              <Sparkles className="h-5 w-5" />
+              Пройти анкету
+            </Link>
+          </div>
+        </div>
+      </section>
+
+      {/* Testimonials */}
       {testimonials.length > 0 && (
         <section className="bg-primary-50/50 py-20 sm:py-28">
           <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
@@ -166,13 +284,13 @@ export default async function HomePage() {
               {testimonials.map((t) => (
                 <div
                   key={t.id}
-                  className="rounded-2xl border border-gray-100 bg-white p-6 shadow-sm"
+                  className="rounded-2xl border border-primary-100 bg-white p-6 shadow-sm"
                 >
                   <div className="mb-3 flex gap-0.5">
                     {Array.from({ length: t.rating }).map((_, i) => (
                       <Star
                         key={i}
-                        className="h-4 w-4 fill-amber-400 text-amber-400"
+                        className="h-4 w-4 fill-accent-400 text-accent-400"
                       />
                     ))}
                   </div>
@@ -189,7 +307,8 @@ export default async function HomePage() {
         </section>
       )}
 
-      <section className="bg-white py-20 sm:py-28">
+      {/* Resources */}
+      <section className="bg-cream py-20 sm:py-28">
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
           <div className="mb-12 text-center">
             <h2 className="text-3xl font-bold tracking-tight text-primary-950 sm:text-4xl">
@@ -203,7 +322,7 @@ export default async function HomePage() {
           <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
             <Link
               href="/materials"
-              className="group rounded-2xl border border-gray-100 bg-gradient-to-br from-primary-50 to-white p-6 shadow-sm transition-shadow hover:shadow-md"
+              className="group rounded-2xl border border-primary-100 bg-gradient-to-br from-primary-50 to-white p-6 shadow-sm transition-shadow hover:shadow-md"
             >
               <BookOpen className="mb-4 h-10 w-10 text-primary-600" />
               <h3 className="mb-2 text-lg font-semibold text-primary-950">
@@ -220,9 +339,9 @@ export default async function HomePage() {
 
             <Link
               href="/courses"
-              className="group rounded-2xl border border-gray-100 bg-gradient-to-br from-accent-50 to-white p-6 shadow-sm transition-shadow hover:shadow-md"
+              className="group rounded-2xl border border-primary-100 bg-gradient-to-br from-accent-50 to-white p-6 shadow-sm transition-shadow hover:shadow-md"
             >
-              <Video className="mb-4 h-10 w-10 text-accent-600" />
+              <Video className="mb-4 h-10 w-10 text-accent-500" />
               <h3 className="mb-2 text-lg font-semibold text-primary-950">
                 Онлайн-курсы
               </h3>
@@ -230,16 +349,16 @@ export default async function HomePage() {
                 Видео-курсы с практическими упражнениями для развития памяти,
                 внимания и мышления ребёнка.
               </p>
-              <span className="mt-4 inline-flex items-center gap-1 text-sm font-medium text-accent-600 transition-colors group-hover:text-accent-700">
+              <span className="mt-4 inline-flex items-center gap-1 text-sm font-medium text-accent-500 transition-colors group-hover:text-accent-600">
                 Смотреть <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-0.5" />
               </span>
             </Link>
 
             <Link
               href="/screening"
-              className="group rounded-2xl border border-gray-100 bg-gradient-to-br from-amber-50 to-white p-6 shadow-sm transition-shadow hover:shadow-md"
+              className="group rounded-2xl border border-primary-100 bg-gradient-to-br from-primary-50 to-white p-6 shadow-sm transition-shadow hover:shadow-md"
             >
-              <Shield className="mb-4 h-10 w-10 text-amber-600" />
+              <Shield className="mb-4 h-10 w-10 text-primary-600" />
               <h3 className="mb-2 text-lg font-semibold text-primary-950">
                 Скрининг-анкета
               </h3>
@@ -247,7 +366,7 @@ export default async function HomePage() {
                 Быстрая оценка развития ребёнка: заполните анкету и получите
                 предварительные рекомендации.
               </p>
-              <span className="mt-4 inline-flex items-center gap-1 text-sm font-medium text-amber-600 transition-colors group-hover:text-amber-700">
+              <span className="mt-4 inline-flex items-center gap-1 text-sm font-medium text-primary-600 transition-colors group-hover:text-primary-700">
                 Пройти <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-0.5" />
               </span>
             </Link>
@@ -255,7 +374,8 @@ export default async function HomePage() {
         </div>
       </section>
 
-      <section className="bg-gradient-to-br from-primary-600 to-primary-800 py-20 sm:py-28">
+      {/* CTA */}
+      <section className="bg-gradient-to-br from-primary-700 to-primary-900 py-20 sm:py-28">
         <div className="mx-auto max-w-4xl px-4 text-center sm:px-6 lg:px-8">
           <h2 className="text-3xl font-bold tracking-tight text-white sm:text-4xl">
             Готовы помочь вашему ребёнку?
@@ -274,10 +394,10 @@ export default async function HomePage() {
             </Link>
             <Link
               href="/booking"
-              className="inline-flex items-center gap-2 rounded-xl border-2 border-primary-300 bg-transparent px-6 py-3.5 text-base font-semibold text-white transition-colors hover:border-primary-200 hover:bg-primary-700"
+              className="inline-flex items-center gap-2 rounded-xl border-2 border-white/70 bg-transparent px-6 py-3.5 text-base font-semibold text-white transition-colors hover:border-white hover:bg-white/10"
             >
               <Calendar className="h-5 w-5" />
-              Записаться на консультацию
+              Записаться
             </Link>
           </div>
         </div>

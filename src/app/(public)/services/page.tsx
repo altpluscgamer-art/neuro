@@ -54,6 +54,29 @@ type ServiceRow = {
   updatedAt: Date;
 };
 
+const steps = [
+  {
+    number: "1",
+    title: "Диагностика",
+    desc: "Выявляем сильные и слабые стороны развития ребёнка с помощью нейропсихологических проб.",
+  },
+  {
+    number: "2",
+    title: "План",
+    desc: "Составляем индивидуальный маршрут коррекции и развития с учётом результатов диагностики.",
+  },
+  {
+    number: "3",
+    title: "Занятия",
+    desc: "Проводим игровую нейрокоррекцию — ребёнок развивается через увлекательные задания.",
+  },
+  {
+    number: "4",
+    title: "Поддержка",
+    desc: "Даём рекомендации для родителей, чтобы закреплять результат и помогать ребёнку дома.",
+  },
+];
+
 export default async function ServicesPage() {
   const services: ServiceRow[] = await prisma.service.findMany({
     where: { isActive: true },
@@ -70,15 +93,14 @@ export default async function ServicesPage() {
         author="Мария Иванова"
       />
 
-      <section className="bg-gradient-to-br from-primary-50 via-white to-accent-50 py-16 sm:py-24">
+      <section className="bg-gradient-to-br from-primary-50 via-cream to-accent-50 py-16 sm:py-24">
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
           <div className="mx-auto max-w-2xl text-center">
             <h1 className="text-4xl font-bold tracking-tight text-primary-950 sm:text-5xl">
-              Наши услуги
+              Услуги
             </h1>
             <p className="mt-6 text-lg leading-relaxed text-gray-600">
-              Комплексная нейропсихологическая помощь детям от 1 до 13 лет.
-              Подберём программу, которая подходит именно вашему ребёнку.
+              Комплексный подход к развитию и поддержке вашего ребёнка
             </p>
           </div>
         </div>
@@ -91,16 +113,9 @@ export default async function ServicesPage() {
               {services.map((service) => (
                 <div
                   key={service.id}
-                  className="group flex flex-col rounded-2xl border border-gray-100 bg-white p-6 shadow-sm transition-shadow hover:shadow-md"
+                  className="group flex flex-col rounded-2xl border border-primary-100 bg-white p-6 shadow-sm transition-colors hover:border-primary-300"
                 >
-                  <SEOHead
-                    type="service"
-                    title={service.title}
-                    description={service.description}
-                    url={`/services/${service.slug}`}
-                    author="Мария Иванова"
-                  />
-                  <div className="mb-4 inline-flex self-start rounded-xl bg-primary-50 p-3">
+                  <div className="mb-4 inline-flex self-start rounded-full bg-primary-50 p-3">
                     <ServiceIcon name={service.icon} />
                   </div>
                   <h2 className="mb-2 text-lg font-semibold text-primary-950">
@@ -139,47 +154,26 @@ export default async function ServicesPage() {
         </section>
       )}
 
-      <section className="bg-primary-50/50 py-20 sm:py-28">
+      <section className="bg-cream py-20 sm:py-28">
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
           <div className="mx-auto max-w-2xl text-center">
             <h2 className="text-3xl font-bold tracking-tight text-primary-950 sm:text-4xl">
-              Как проходит работа?
+              Как мы работаем
             </h2>
             <p className="mt-4 text-lg text-gray-600">
-              Четыре простых шага к результату
+              Четыре шага к результату
             </p>
           </div>
 
           <div className="mt-12 grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
-            {[
-              {
-                step: "01",
-                title: "Заявка",
-                desc: "Оставьте заявку на консультацию или заполните скрининг-анкету",
-              },
-              {
-                step: "02",
-                title: "Диагностика",
-                desc: "Проведём нейропсихологическую диагностику и определим сильные стороны",
-              },
-              {
-                step: "03",
-                title: "Программа",
-                desc: "Составим индивидуальную программу коррекции и развития",
-              },
-              {
-                step: "04",
-                title: "Результат",
-                desc: "Регулярные занятия и поддержка до достижения устойчивого результата",
-              },
-            ].map((s) => (
+            {steps.map((s) => (
               <div
-                key={s.step}
-                className="rounded-2xl border border-gray-100 bg-white p-6 shadow-sm"
+                key={s.number}
+                className="rounded-2xl border border-primary-100 bg-white p-6 shadow-sm"
               >
-                <span className="mb-3 block text-3xl font-bold text-primary-200">
-                  {s.step}
-                </span>
+                <div className="mb-4 inline-flex h-12 w-12 items-center justify-center rounded-full bg-primary-600 text-lg font-bold text-white">
+                  {s.number}
+                </div>
                 <h3 className="mb-2 text-lg font-semibold text-primary-950">
                   {s.title}
                 </h3>
@@ -198,8 +192,8 @@ export default async function ServicesPage() {
             Не знаете, с чего начать?
           </h2>
           <p className="mt-4 text-lg leading-relaxed text-primary-100">
-            Пройдите бесплатную скрининг-анкету — она поможет определить, какая
-            услуга подойдёт вашему ребёнку.
+            Пройдите бесплатную скрининг-анкету&nbsp;&mdash; она поможет
+            определить, какая услуга подойдёт вашему ребёнку.
           </p>
           <div className="mt-8 flex flex-col items-center justify-center gap-4 sm:flex-row">
             <Link

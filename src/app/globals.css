@@ -1,29 +1,32 @@
 @import "tailwindcss";
 
 :root {
-  --color-primary-50: #eef2ff;
-  --color-primary-100: #e0e7ff;
-  --color-primary-200: #c7d2fe;
-  --color-primary-300: #a5b4fc;
-  --color-primary-400: #818cf8;
-  --color-primary-500: #6366f1;
-  --color-primary-600: #4f46e5;
-  --color-primary-700: #4338ca;
-  --color-primary-800: #3730a3;
-  --color-primary-900: #312e81;
-  --color-primary-950: #1e1b4b;
+  --color-primary-50: #f4f6ef;
+  --color-primary-100: #e8ebd9;
+  --color-primary-200: #d1d8b8;
+  --color-primary-300: #b9c297;
+  --color-primary-400: #9aa877;
+  --color-primary-500: #7a8864;
+  --color-primary-600: #6a7450;
+  --color-primary-700: #586043;
+  --color-primary-800: #46503a;
+  --color-primary-900: #373e30;
+  --color-primary-950: #2a3023;
 
-  --color-accent-50: #f0fdfa;
-  --color-accent-100: #ccfbf1;
-  --color-accent-200: #99f6e4;
-  --color-accent-300: #5eead4;
-  --color-accent-400: #2dd4bf;
-  --color-accent-500: #14b8a6;
-  --color-accent-600: #0d9488;
-  --color-accent-700: #0f766e;
-  --color-accent-800: #115e59;
-  --color-accent-900: #134e4a;
-  --color-accent-950: #042f2e;
+  --color-accent-50: #fdf3ea;
+  --color-accent-100: #fae2d0;
+  --color-accent-200: #f5c5a1;
+  --color-accent-300: #f0a76d;
+  --color-accent-400: #ec8538;
+  --color-accent-500: #e0701e;
+  --color-accent-600: #c25a15;
+  --color-accent-700: #a04515;
+  --color-accent-800: #823818;
+  --color-accent-900: #6b3018;
+  --color-accent-950: #3c1810;
+
+  --color-cream: #faf5ef;
+  --color-peach: #f0d3c1;
 }
 
 @theme inline {
@@ -51,8 +54,11 @@
   --color-accent-900: var(--color-accent-900);
   --color-accent-950: var(--color-accent-950);
 
-  --color-background: #ffffff;
-  --color-foreground: #1e1b4b;
+  --color-cream: var(--color-cream);
+  --color-peach: var(--color-peach);
+
+  --color-background: #faf5ef;
+  --color-foreground: #2a3023;
   --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);
 }
@@ -63,7 +69,7 @@ html {
 }
 
 body {
-  background: var(--color-background);
+  background: var(--color-cream);
   color: var(--color-foreground);
   font-family: var(--font-sans), system-ui, -apple-system, sans-serif;
   -webkit-font-smoothing: antialiased;

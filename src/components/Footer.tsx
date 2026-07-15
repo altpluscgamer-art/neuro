@@ -1,15 +1,15 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, type CSSProperties } from "react";
 import Link from "next/link";
 import {
   Brain,
   Phone,
   Mail,
+  Clock,
   ExternalLink,
   Send,
   MessageCircle,
-  Share2,
   PlayCircle,
   ArrowRight,
 } from "lucide-react";
@@ -26,12 +26,13 @@ const navLinks = [
 ];
 
 const socialKeys = [
-  { key: "social_instagram", icon: ExternalLink, label: "Instagram" },
   { key: "social_telegram", icon: Send, label: "Telegram" },
+  { key: "social_instagram", icon: ExternalLink, label: "Instagram" },
   { key: "social_whatsapp", icon: MessageCircle, label: "WhatsApp" },
-  { key: "social_vk", icon: Share2, label: "VK" },
   { key: "social_youtube", icon: PlayCircle, label: "YouTube" },
 ] as const;
+
+const touchAction: CSSProperties = { touchAction: "manipulation" };
 
 export default function Footer() {
   const [settings, setSettings] = useState<Settings>({});
@@ -44,24 +45,33 @@ export default function Footer() {
   }, []);
 
   const activeSocials = socialKeys.filter((s) => settings[s.key]);
+  const phone = settings.site_phone;
+  const email = settings.site_email;
 
   return (
-    <footer className="border-t border-indigo-100 bg-indigo-950 text-indigo-100">
+    <footer className="bg-primary-950 text-primary-100">
       <div className="mx-auto max-w-7xl px-4 py-12 sm:px-6 lg:px-8">
         <div className="grid gap-8 sm:grid-cols-2 lg:grid-cols-3">
+          {/* About */}
           <div>
-            <Link href="/" className="mb-4 flex items-center gap-2 text-lg font-bold text-white">
-              <Brain className="h-6 w-6 text-teal-400" />
+            <Link
+              href="/"
+              className="mb-4 flex items-center gap-2 text-lg font-bold text-white"
+              style={touchAction}
+            >
+              <Brain className="h-6 w-6 text-accent-400" />
               Нейро
             </Link>
-            <p className="text-sm leading-relaxed text-indigo-300">
+            <p className="text-sm leading-relaxed text-primary-300">
               Онлайн-платформа для родителей и детских нейропсихологов.
-              Помогаем раскрыть потенциал каждого ребёнка через научно обоснованные методики.
+              Помогаем раскрыть потенциал каждого ребёнка через научно
+              обоснованные методики.
             </p>
           </div>
 
+          {/* Navigation */}
           <div>
-            <h3 className="mb-4 text-sm font-semibold uppercase tracking-wider text-teal-400">
+            <h3 className="mb-4 text-sm font-semibold uppercase tracking-wider text-accent-300">
               Навигация
             </h3>
             <ul className="space-y-2">
@@ -69,7 +79,8 @@ export default function Footer() {
                 <li key={href}>
                   <Link
                     href={href}
-                    className="text-sm text-indigo-200 transition-colors hover:text-white"
+                    className="text-sm text-primary-200 transition-colors hover:text-white"
+                    style={touchAction}
                   >
                     {label}
                   </Link>
@@ -78,33 +89,40 @@ export default function Footer() {
             </ul>
           </div>
 
+          {/* Contacts */}
           <div>
-            <h3 className="mb-4 text-sm font-semibold uppercase tracking-wider text-teal-400">
+            <h3 className="mb-4 text-sm font-semibold uppercase tracking-wider text-accent-300">
               Контакты
             </h3>
             <ul className="space-y-3">
-              {settings.site_phone && (
+              {phone && (
                 <li>
                   <a
-                    href={`tel:${settings.site_phone.replace(/[^\d+]/g, "")}`}
-                    className="flex items-center gap-2 text-sm text-indigo-200 transition-colors hover:text-white"
+                    href={`tel:${phone.replace(/[^\d+]/g, "")}`}
+                    className="flex items-center gap-2 text-sm text-primary-200 transition-colors hover:text-white"
+                    style={touchAction}
                   >
-                    <Phone className="h-4 w-4 text-teal-400" />
-                    {settings.site_phone}
+                    <Phone className="h-4 w-4 text-accent-400" />
+                    {phone}
                   </a>
                 </li>
               )}
-              {settings.site_email && (
+              {email && (
                 <li>
                   <a
-                    href={`mailto:${settings.site_email}`}
-                    className="flex items-center gap-2 text-sm text-indigo-200 transition-colors hover:text-white"
+                    href={`mailto:${email}`}
+                    className="flex items-center gap-2 text-sm text-primary-200 transition-colors hover:text-white"
+                    style={touchAction}
                   >
-                    <Mail className="h-4 w-4 text-teal-400" />
-                    {settings.site_email}
+                    <Mail className="h-4 w-4 text-accent-400" />
+                    {email}
                   </a>
                 </li>
               )}
+              <li className="flex items-center gap-2 text-sm text-primary-200">
+                <Clock className="h-4 w-4 text-accent-400" />
+                Режим работы: с 9:00 до 19:00
+              </li>
             </ul>
 
             {activeSocials.length > 0 && (
@@ -115,7 +133,8 @@ export default function Footer() {
                     href={settings[s.key]}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="rounded-lg bg-indigo-800/50 p-2 text-indigo-300 transition-colors hover:bg-indigo-800 hover:text-white"
+                    className="rounded-lg bg-primary-800/50 p-2 text-primary-300 transition-colors hover:bg-primary-800 hover:text-white"
+                    style={touchAction}
                     aria-label={s.label}
                   >
                     <s.icon className="h-4 w-4" />
@@ -132,7 +151,8 @@ export default function Footer() {
               href={settings.social_telegram}
               target="_blank"
               rel="noopener noreferrer"
-              className="inline-flex items-center gap-2 rounded-xl bg-sky-500/10 px-5 py-2.5 text-sm font-medium text-sky-300 ring-1 ring-sky-500/30 transition-colors hover:bg-sky-500/20 hover:text-sky-200"
+              className="inline-flex items-center gap-2 rounded-xl bg-accent-400/10 px-5 py-2.5 text-sm font-medium text-accent-300 ring-1 ring-accent-400/30 transition-colors hover:bg-accent-400/20 hover:text-accent-200"
+              style={touchAction}
             >
               <Send className="h-4 w-4" />
               Наш Telegram-канал
@@ -141,8 +161,11 @@ export default function Footer() {
           </div>
         )}
 
-        <div className="mt-10 border-t border-indigo-800 pt-6 text-center text-xs text-indigo-400">
-          &copy; {new Date().getFullYear()} Нейро. Все права защищены.
+        <div className="mt-10 border-t border-primary-800 pt-6 text-center text-xs text-primary-200">
+          <p>&copy; {new Date().getFullYear()} Нейро. Все права защищены.</p>
+          <p className="mt-1 text-primary-300">
+            Онлайн-платформа для родителей и детских специалистов
+          </p>
         </div>
       </div>
     </footer>
