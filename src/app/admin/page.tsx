@@ -1,14 +1,36 @@
 import prisma from "@/lib/prisma";
-import { BarChart3, Users, FileText, Calendar, Clock, TrendingUp } from "lucide-react";
+import { BarChart3, Users, FileText, Calendar, Clock, TrendingUp, Eye, TrendingDown } from "lucide-react";
 
 export default async function AdminDashboard() {
-  const [usersCount, screeningCount, pendingConsultations, upcomingBookings] =
-    await Promise.all([
-      prisma.user.count(),
-      prisma.screeningResult.count(),
-      prisma.consultationRequest.count({ where: { status: "new" } }),
-      prisma.booking.count({ where: { status: "pending" } }),
-    ]);
+  const [
+    usersCount,
+    screeningCount,
+    completedScreeningCount,
+    pendingConsultations,
+    upcomingBookings,
+    totalArticles,
+    totalCourses,
+    todayStats,
+    weekStats,
+    allTimeStats,
+  ] = await Promise.all([
+    prisma.user.count({ where: { role: { not: "guest" } } }),
+    prisma.screeningResult.count(),
+    prisma.screeningResult.count({ where: { completed: true } }),
+    prisma.consultationRequest.count({ where: { status: "new" } }),
+    prisma.booking.count({ where: { status: "pending" } }),
+    prisma.article.count({ where: { isPublished: true } }),
+    prisma.course.count({ where: { isPublished: true } }),
+    prisma.siteStat.findFirst({ where: { date: new Date().toISOString().split("T")[0] } }),
+    prisma.siteStat.findMany({
+      where: { date: { gte: new Date(Date.now() - 7 * 86400000).toISOString().split("T")[0] } },
+      orderBy: { date: "asc" },
+    }),
+    prisma.siteStat.aggregate({ _sum: { visits: true } }),
+  ]);
+
+  const weekTotal = weekStats.reduce((sum, s) => sum + s.visits, 0);
+  const todayVisits = todayStats?.visits || 0;
 
   const recentScreenings = await prisma.screeningResult.findMany({
     take: 5,
@@ -23,16 +45,17 @@ export default async function AdminDashboard() {
 
   const stats = [
     { label: "Пользователей", value: usersCount, icon: Users, color: "bg-blue-50 text-blue-600" },
-    { label: "Результатов анкет", value: screeningCount, icon: FileText, color: "bg-green-50 text-green-600" },
+    { label: "Анкет пройдено", value: completedScreeningCount, icon: FileText, color: "bg-green-50 text-green-600" },
     { label: "Новых запросов", value: pendingConsultations, icon: Clock, color: "bg-amber-50 text-amber-600" },
-    { label: "Предстоящих записей", value: upcomingBookings, icon: Calendar, color: "bg-violet-50 text-violet-600" },
+    { label: "Записей", value: upcomingBookings, icon: Calendar, color: "bg-violet-50 text-violet-600" },
   ];
+
+  const maxWeekVisits = Math.max(...weekStats.map((s) => s.visits), 1);
 
   return (
     <div className="space-y-8">
       <h1 className="text-2xl font-bold text-gray-900">Панель управления</h1>
 
-      {/* Stats cards */}
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
         {stats.map((s) => (
           <div key={s.label} className="rounded-xl border border-gray-200 bg-white p-5">
@@ -49,37 +72,67 @@ export default async function AdminDashboard() {
         ))}
       </div>
 
-      {/* Quick actions */}
       <div className="rounded-xl border border-gray-200 bg-white p-6">
-        <h2 className="mb-4 text-lg font-semibold text-gray-900">Быстрые действия</h2>
-        <div className="flex flex-wrap gap-3">
-          <a
-            href="/admin/schedule"
-            className="inline-flex items-center gap-2 rounded-lg bg-violet-600 px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-violet-700"
-          >
-            <Calendar className="h-4 w-4" />
-            Управление расписанием
-          </a>
-          <a
-            href="/admin/content"
-            className="inline-flex items-center gap-2 rounded-lg border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 transition-colors hover:bg-gray-50"
-          >
-            <FileText className="h-4 w-4" />
-            Управление контентом
-          </a>
-          <a
-            href="/admin/consultation-requests"
-            className="inline-flex items-center gap-2 rounded-lg border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 transition-colors hover:bg-gray-50"
-          >
-            <TrendingUp className="h-4 w-4" />
-            Обработать запросы
-          </a>
+        <div className="mb-4 flex items-center gap-2">
+          <BarChart3 className="h-5 w-5 text-violet-600" />
+          <h2 className="text-lg font-semibold text-gray-900">Аналитика посещений</h2>
         </div>
+
+        <div className="mb-6 grid grid-cols-2 gap-4 sm:grid-cols-4">
+          <div className="rounded-lg bg-gray-50 p-4">
+            <div className="flex items-center gap-1.5 text-xs text-gray-500">
+              <Eye className="h-3.5 w-3.5" />
+              Сегодня
+            </div>
+            <p className="mt-1 text-2xl font-bold text-gray-900">{todayVisits}</p>
+          </div>
+          <div className="rounded-lg bg-gray-50 p-4">
+            <div className="flex items-center gap-1.5 text-xs text-gray-500">
+              <TrendingUp className="h-3.5 w-3.5" />
+              За неделю
+            </div>
+            <p className="mt-1 text-2xl font-bold text-gray-900">{weekTotal}</p>
+          </div>
+          <div className="rounded-lg bg-gray-50 p-4">
+            <div className="flex items-center gap-1.5 text-xs text-gray-500">
+              <BarChart3 className="h-3.5 w-3.5" />
+              Всего посещений
+            </div>
+            <p className="mt-1 text-2xl font-bold text-gray-900">{allTimeStats._sum.visits || 0}</p>
+          </div>
+          <div className="rounded-lg bg-gray-50 p-4">
+            <div className="flex items-center gap-1.5 text-xs text-gray-500">
+              <FileText className="h-3.5 w-3.5" />
+              Опубликованных статей
+            </div>
+            <p className="mt-1 text-2xl font-bold text-gray-900">{totalArticles}</p>
+          </div>
+        </div>
+
+        {weekStats.length > 0 && (
+          <div>
+            <p className="mb-3 text-sm font-medium text-gray-600">Посещения за последние 7 дней</p>
+            <div className="flex items-end gap-2" style={{ height: "120px" }}>
+              {weekStats.map((s) => (
+                <div key={s.id} className="flex flex-1 flex-col items-center gap-1">
+                  <div className="flex w-full items-end justify-center" style={{ height: "90px" }}>
+                    <div
+                      className="w-full max-w-[40px] rounded-t bg-violet-500 transition-all"
+                      style={{ height: `${(s.visits / maxWeekVisits) * 100}%`, minHeight: "4px" }}
+                      title={`${s.visits} посещений`}
+                    />
+                  </div>
+                  <span className="text-[10px] text-gray-400">
+                    {new Date(s.date + "T00:00:00").toLocaleDateString("ru-RU", { weekday: "short" })}
+                  </span>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
       </div>
 
-      {/* Recent activity */}
       <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
-        {/* Recent screenings */}
         <div className="rounded-xl border border-gray-200 bg-white p-6">
           <div className="mb-4 flex items-center gap-2">
             <BarChart3 className="h-5 w-5 text-violet-600" />
@@ -92,14 +145,12 @@ export default async function AdminDashboard() {
               {recentScreenings.map((s) => (
                 <li key={s.id} className="flex items-center justify-between rounded-lg bg-gray-50 px-4 py-3">
                   <div>
-                    <p className="text-sm font-medium text-gray-900">{s.user?.name ?? "Аноним"}</p>
+                    <p className="text-sm font-medium text-gray-900">{s.user?.name ?? s.parentName ?? "Аноним"}</p>
                     <p className="text-xs text-gray-500">Возраст ребёнка: {s.childAge}</p>
                   </div>
                   <span
                     className={`rounded-full px-2.5 py-0.5 text-xs font-medium ${
-                      s.completed
-                        ? "bg-green-100 text-green-700"
-                        : "bg-amber-100 text-amber-700"
+                      s.completed ? "bg-green-100 text-green-700" : "bg-amber-100 text-amber-700"
                     }`}
                   >
                     {s.completed ? "Завершено" : "В процессе"}
@@ -110,7 +161,6 @@ export default async function AdminDashboard() {
           )}
         </div>
 
-        {/* Recent consultations */}
         <div className="rounded-xl border border-gray-200 bg-white p-6">
           <div className="mb-4 flex items-center gap-2">
             <Clock className="h-5 w-5 text-violet-600" />
@@ -131,15 +181,11 @@ export default async function AdminDashboard() {
                       c.status === "new"
                         ? "bg-blue-100 text-blue-700"
                         : c.status === "in_progress"
-                        ? "bg-amber-100 text-amber-700"
-                        : "bg-green-100 text-green-700"
+                          ? "bg-amber-100 text-amber-700"
+                          : "bg-green-100 text-green-700"
                     }`}
                   >
-                    {c.status === "new"
-                      ? "Новый"
-                      : c.status === "in_progress"
-                      ? "В работе"
-                      : "Завершён"}
+                    {c.status === "new" ? "Новый" : c.status === "in_progress" ? "В работе" : "Завершён"}
                   </span>
                 </li>
               ))}

@@ -1,36 +1,157 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Нейро — Онлайн-платформа для родителей и детских специалистов
 
-## Getting Started
+## О проекте
+Онлайн-платформа для нейропсихологической помощи детям от 1 до 13 лет.
 
-First, run the development server:
+## Технологии
+- Next.js 16 (App Router)
+- TypeScript
+- Tailwind CSS v4
+- Prisma 7 + SQLite (локально) / PostgreSQL (продакшен)
+- NextAuth.js
+- @react-pdf/renderer
 
+## Быстрый старт
+
+### Установка
 ```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+npm install
+npx prisma generate
+npx prisma migrate dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+### Запуск
+```bash
+npm run dev
+```
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+Открыть http://localhost:3000
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+### Заполнение БД тестовыми данными
+Выполнить POST запрос:
+```bash
+curl -X POST http://localhost:3000/api/admin/seed
+```
 
-## Learn More
+Или в PowerShell:
+```powershell
+Invoke-RestMethod -Uri "http://localhost:3000/api/admin/seed" -Method POST
+```
 
-To learn more about Next.js, take a look at the following resources:
+## Вход в админ-панель
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+URL: http://localhost:3000/auth/login
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+| Поле | Значение |
+|------|----------|
+| Email | admin@neuro.ru |
+| Пароль | admin123 |
 
-## Deploy on Vercel
+После входа: http://localhost:3000/admin
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+## Настройка интеграций
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+Все настройки в админ-панели: `/admin/settings`
+
+### Telegram-бот
+1. Откройте @BotFather в Telegram
+2. Создайте бота: `/newbot`
+3. Получите **Bot Token** → вставьте в поле "Bot Token"
+4. Получите **Chat ID**: напишите @userinfobot, свой ID → вставьте в "Chat ID"
+5. Укажите ссылку на ваш канал (например, https://t.me/your_channel)
+6. Включите "Авто-синхронизация" — посты из канала будут автоматически появляться в разделе "Материалы"
+
+**Webhook:** После настройки, откройте в браузере:
+`http://localhost:3000/api/telegram/webhook` (GET запрос установит webhook)
+
+### SMTP (email-уведомления)
+1. Для Yandex: host=smtp.yandex.ru, port=587, user=your@yandex.ru, pass=app_password
+2. Для Gmail: host=smtp.gmail.com, port=587, user=your@gmail.com, pass=app_password
+3. Для Mail.ru: host=smtp.mail.ru, port=587
+4. Получите пароль приложения (не обычный пароль!) в настройках почтового сервиса
+
+### Яндекс.Метрика
+1. Зарегистрируйтесь на https://metrika.yandex.ru
+2. Создайте счётчик для вашего сайта
+3. Скопируйте **номер счётчика** → вставьте в поле "ID счётчика"
+4. Включите toggle
+
+### Оплата (YooKassa)
+1. Зарегистрируйтесь на https://yookassa.ru
+2. В личном кабинете: Настройки → API ключи
+3. Скопируйте **shopId** и **Секретный ключ**
+4. Вставьте в соответствующие поля в админке
+5. Для тестирования включите "Тестовый режим"
+6. Webhook для уведомлений: `https://ваш-домен/api/payments/yookassa/notification`
+
+### Реклама (Яндекс РСЯ)
+1. Зарегистрируйтесь в Рекламной сети Яндекса
+2. Создайте рекламный блок
+3. Скопируйте **client ID** → вставьте в поле
+
+### Отзывы (Яндекс.Карты / Google Maps)
+1. Найдите вашу организацию на Яндекс.Картах
+2. Скопируйте URL страницы отзывов → вставьте в "Yandex URL"
+3. Аналогично для Google Maps
+
+### Социальные сети
+Просто вставьте ссылки на ваши страницы:
+- Instagram: https://instagram.com/your_account
+- Telegram: https://t.me/your_channel
+- WhatsApp: https://wa.me/79990000000
+- VK: https://vk.com/your_group
+- YouTube: https://youtube.com/@your_channel
+
+## Структура проекта
+```
+src/
+  app/
+    (public)/          — публичные страницы (с Header/Footer)
+      page.tsx         — главная
+      about/           — обо мне
+      services/        — услуги
+      materials/       — статьи
+      courses/         — курсы
+      booking/         — запись на приём
+      screening/       — анкета
+      auth/            — вход/регистрация
+    admin/             — админ-панель (без публичного Header/Footer)
+      page.tsx         — дашборд с аналитикой
+      schedule/        — расписание
+      content/         — управление контентом
+      screening-results/ — результаты анкет
+      consultation-requests/ — запросы
+      users/           — пользователи
+      settings/        — настройки интеграций
+    api/               — API routes
+  components/           — React-компоненты
+  lib/                  — утилиты (prisma, auth, screening-logic, settings, notifications)
+```
+
+## Тесты
+```bash
+npm test
+```
+
+## Сборка
+```bash
+npm run build
+```
+
+## Деплой на Vercel
+1. Создайте проект на Vercel, подключите GitHub-репозиторий
+2. Создайте PostgreSQL базу (Supabase/Neon)
+3. В переменных окружения Vercel укажите:
+   - `DATABASE_URL` — строка подключения к PostgreSQL
+   - `NEXTAUTH_SECRET` — случайная строка
+   - `NEXTAUTH_URL` — ваш домен
+4. Измените в `prisma/schema.prisma`: `provider = "postgresql"`
+5. Выполните `npx prisma migrate deploy`
+6. Заполните `TELEGRAM_BOT_TOKEN`, `SMTP_*`, `YOOKASSA_*` в Vercel env vars
+7. После деплоя выполните POST `/api/admin/seed` для создания админа
+
+## Переменные окружения
+См. `.env.example` для полного списка.
+
+## License
+MIT

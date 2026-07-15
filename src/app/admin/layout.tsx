@@ -24,7 +24,6 @@ const navItems = [
   { href: "/admin/content", label: "Контент", icon: FileText },
   { href: "/admin/screening-results", label: "Результаты анкет", icon: ClipboardList },
   { href: "/admin/consultation-requests", label: "Запросы", icon: MessageSquare },
-  { href: "/admin/settings", label: "Настройки", icon: Settings },
   { href: "/admin/users", label: "Пользователи", icon: Users },
   { href: "/admin/settings", label: "Настройки", icon: Settings },
 ];
@@ -79,10 +78,13 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
         </nav>
 
         <div className="border-t border-gray-200 p-3">
-          <button className="flex w-full items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium text-gray-600 transition-colors hover:bg-gray-100 hover:text-gray-900">
+          <Link
+            href="/"
+            className="flex w-full items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium text-gray-600 transition-colors hover:bg-gray-100 hover:text-gray-900"
+          >
             <LogOut className="h-5 w-5" />
             Выйти
-          </button>
+          </Link>
         </div>
       </aside>
 

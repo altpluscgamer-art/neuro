@@ -12,32 +12,30 @@ type Slot = {
   title: string;
   totalSeats: number;
   bookedSeats: number;
+  isActive: boolean;
 };
 
 function formatDate(dateStr: string) {
   const d = new Date(dateStr + "T00:00:00");
-  return d.toLocaleDateString("ru-RU", {
-    weekday: "long",
-    day: "numeric",
-    month: "long",
-  });
+  return d.toLocaleDateString("ru-RU", { weekday: "long", day: "numeric", month: "long" });
 }
 
 function capitalize(s: string) {
   return s.charAt(0).toUpperCase() + s.slice(1);
 }
 
-type SlotTypeLabels = Record<string, string>;
-const typeLabels: SlotTypeLabels = {
+const typeLabels: Record<string, string> = {
   consultation: "Консультация",
-  screening: "Скрининг",
+  diagnostics: "Диагностика",
+  correction: "Нейрокоррекция",
   group: "Групповое занятие",
 };
 
 const typeColors: Record<string, string> = {
   consultation: "bg-indigo-50 text-indigo-700 ring-indigo-200",
-  screening: "bg-teal-50 text-teal-700 ring-teal-200",
-  group: "bg-violet-50 text-violet-700 ring-violet-200",
+  diagnostics: "bg-teal-50 text-teal-700 ring-teal-200",
+  correction: "bg-violet-50 text-violet-700 ring-violet-200",
+  group: "bg-amber-50 text-amber-700 ring-amber-200",
 };
 
 export default function BookingPage() {
@@ -52,15 +50,23 @@ export default function BookingPage() {
     childName: "",
     childAge: "",
     notes: "",
+    parentName: "",
+    parentPhone: "",
+    parentEmail: "",
   });
 
   useEffect(() => {
-    fetch("/api/schedule-slots")
+    fetch("/api/admin/schedule")
       .then((r) => {
         if (!r.ok) throw new Error("Не удалось загрузить расписание");
         return r.json();
       })
-      .then((data) => setSlots(data))
+      .then((data: Slot[]) => {
+        const available = data.filter(
+          (s) => s.isActive && s.totalSeats - s.bookedSeats > 0
+        );
+        setSlots(available);
+      })
       .catch((e) => setError(e.message))
       .finally(() => setLoading(false));
   }, []);
@@ -75,7 +81,7 @@ export default function BookingPage() {
 
   function openModal(slot: Slot) {
     setSelected(slot);
-    setForm({ childName: "", childAge: "", notes: "" });
+    setForm({ childName: "", childAge: "", notes: "", parentName: "", parentPhone: "", parentEmail: "" });
     setFormError("");
     setSuccess(false);
   }
@@ -98,6 +104,10 @@ export default function BookingPage() {
       setFormError("Возраст должен быть от 1 до 18");
       return;
     }
+    if (!form.parentName.trim() || !form.parentPhone.trim() || !form.parentEmail.trim()) {
+      setFormError("Заполните ваши контактные данные");
+      return;
+    }
     setSubmitting(true);
     setFormError("");
     try {
@@ -109,6 +119,9 @@ export default function BookingPage() {
           childName: form.childName.trim(),
           childAge: age,
           notes: form.notes.trim() || undefined,
+          parentName: form.parentName.trim(),
+          parentPhone: form.parentPhone.trim(),
+          parentEmail: form.parentEmail.trim(),
         }),
       });
       if (!res.ok) {
@@ -118,13 +131,11 @@ export default function BookingPage() {
       setSuccess(true);
       setSlots((prev) =>
         prev.map((s) =>
-          s.id === selected.id
-            ? { ...s, bookedSeats: s.bookedSeats + 1 }
-            : s
+          s.id === selected.id ? { ...s, bookedSeats: s.bookedSeats + 1 } : s
         )
       );
-    } catch (e: any) {
-      setFormError(e.message);
+    } catch (e: unknown) {
+      setFormError(e instanceof Error ? e.message : "Произошла ошибка");
     } finally {
       setSubmitting(false);
     }
@@ -138,9 +149,7 @@ export default function BookingPage() {
             <Calendar className="h-4 w-4" />
             Запись на приём
           </div>
-          <h1 className="text-4xl font-bold tracking-tight text-gray-900">
-            Расписание
-          </h1>
+          <h1 className="text-4xl font-bold tracking-tight text-gray-900">Расписание</h1>
           <p className="mt-3 text-lg text-gray-600">
             Выберите удобное время для консультации или занятия
           </p>
@@ -161,12 +170,8 @@ export default function BookingPage() {
         {!loading && !error && sortedDates.length === 0 && (
           <div className="flex flex-col items-center justify-center py-20 text-center">
             <Calendar className="mb-4 h-12 w-12 text-gray-300" />
-            <p className="text-lg font-medium text-gray-500">
-              Нет доступных слотов
-            </p>
-            <p className="mt-1 text-sm text-gray-400">
-              Расписание будет обновлено позже
-            </p>
+            <p className="text-lg font-medium text-gray-500">Нет доступных слотов</p>
+            <p className="mt-1 text-sm text-gray-400">Расписание будет обновлено позже</p>
           </div>
         )}
 
@@ -180,24 +185,17 @@ export default function BookingPage() {
                 <div className="flex flex-col gap-3">
                   {grouped[date].map((slot) => {
                     const available = slot.totalSeats - slot.bookedSeats;
-                    const isFull = available <= 0;
                     return (
                       <div
                         key={slot.id}
-                        className={`flex items-center justify-between rounded-xl border p-4 transition-colors sm:p-5 ${
-                          isFull
-                            ? "border-gray-100 bg-gray-50 opacity-60"
-                            : "border-gray-100 bg-white shadow-sm hover:border-indigo-200 hover:shadow-md"
-                        }`}
+                        className="flex flex-col gap-3 rounded-xl border border-gray-100 bg-white p-4 shadow-sm transition-colors hover:border-indigo-200 hover:shadow-md sm:flex-row sm:items-center sm:justify-between sm:p-5"
                       >
                         <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:gap-4">
                           <span className="inline-flex items-center gap-1.5 text-sm font-semibold text-gray-900">
                             <Clock className="h-4 w-4 text-indigo-500" />
                             {slot.timeStart} – {slot.timeEnd}
                           </span>
-                          <span className="text-sm font-medium text-gray-700">
-                            {slot.title}
-                          </span>
+                          <span className="text-sm font-medium text-gray-700">{slot.title}</span>
                           <span
                             className={`inline-flex items-center gap-1 rounded-full px-2.5 py-0.5 text-xs font-medium ring-1 ring-inset ${
                               typeColors[slot.type] || "bg-gray-50 text-gray-600 ring-gray-200"
@@ -206,23 +204,17 @@ export default function BookingPage() {
                             {typeLabels[slot.type] || slot.type}
                           </span>
                         </div>
-                        <div className="flex items-center gap-4">
-                          <span
-                            className={`inline-flex items-center gap-1 text-sm font-medium ${
-                              isFull ? "text-red-500" : "text-emerald-600"
-                            }`}
-                          >
+                        <div className="flex items-center justify-between gap-4 sm:justify-end">
+                          <span className="inline-flex items-center gap-1 text-sm font-medium text-emerald-600">
                             <Users className="h-4 w-4" />
-                            {isFull ? "Мест нет" : `${available} из ${slot.totalSeats}`}
+                            {available} из {slot.totalSeats}
                           </span>
-                          {!isFull && (
-                            <button
-                              onClick={() => openModal(slot)}
-                              className="rounded-lg bg-indigo-600 px-4 py-2 text-sm font-semibold text-white transition-colors hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2"
-                            >
-                              Записаться
-                            </button>
-                          )}
+                          <button
+                            onClick={() => openModal(slot)}
+                            className="rounded-lg bg-indigo-600 px-4 py-2 text-sm font-semibold text-white transition-colors hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2"
+                          >
+                            Записаться
+                          </button>
                         </div>
                       </div>
                     );
@@ -235,18 +227,25 @@ export default function BookingPage() {
       </div>
 
       {selected && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-4">
-          <div className="w-full max-w-md rounded-2xl bg-white p-6 shadow-xl sm:p-8">
+        <div
+          className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-4"
+          onClick={closeModal}
+        >
+          <div
+            className="max-h-[90vh] w-full max-w-md overflow-y-auto rounded-2xl bg-white p-6 shadow-xl sm:p-8"
+            onClick={(e) => e.stopPropagation()}
+          >
             {success ? (
               <div className="py-6 text-center">
                 <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-emerald-100">
                   <Check className="h-8 w-8 text-emerald-600" />
                 </div>
-                <h3 className="text-xl font-bold text-gray-900">
-                  Вы записаны!
-                </h3>
+                <h3 className="text-xl font-bold text-gray-900">Вы записаны!</h3>
                 <p className="mt-2 text-sm text-gray-600">
                   {selected.title} — {selected.timeStart}–{selected.timeEnd}
+                </p>
+                <p className="mt-1 text-sm text-gray-500">
+                  Мы свяжемся с вами для подтверждения записи.
                 </p>
                 <button
                   onClick={closeModal}
@@ -258,9 +257,7 @@ export default function BookingPage() {
             ) : (
               <>
                 <div className="mb-6 flex items-center justify-between">
-                  <h3 className="text-xl font-bold text-gray-900">
-                    Запись на приём
-                  </h3>
+                  <h3 className="text-xl font-bold text-gray-900">Запись на приём</h3>
                   <button
                     onClick={closeModal}
                     className="rounded-lg p-1 text-gray-400 hover:bg-gray-100 hover:text-gray-600"
@@ -270,9 +267,7 @@ export default function BookingPage() {
                 </div>
 
                 <div className="mb-6 rounded-xl bg-indigo-50 p-4">
-                  <p className="text-sm font-semibold text-indigo-900">
-                    {selected.title}
-                  </p>
+                  <p className="text-sm font-semibold text-indigo-900">{selected.title}</p>
                   <p className="mt-1 text-sm text-indigo-700">
                     {capitalize(formatDate(selected.date))}, {selected.timeStart}–{selected.timeEnd}
                   </p>
@@ -286,44 +281,67 @@ export default function BookingPage() {
 
                 <form onSubmit={handleSubmit} className="flex flex-col gap-4">
                   <div>
-                    <label className="mb-1 block text-sm font-medium text-gray-700">
-                      Имя ребёнка *
-                    </label>
+                    <label className="mb-1 block text-sm font-medium text-gray-700">Имя ребёнка *</label>
                     <input
                       type="text"
                       value={form.childName}
-                      onChange={(e) =>
-                        setForm((f) => ({ ...f, childName: e.target.value }))
-                      }
+                      onChange={(e) => setForm((f) => ({ ...f, childName: e.target.value }))}
                       className="w-full rounded-lg border border-gray-200 px-3 py-2.5 text-sm text-gray-900 outline-none transition-colors focus:border-indigo-400 focus:ring-2 focus:ring-indigo-100"
                       placeholder="Имя ребёнка"
                     />
                   </div>
                   <div>
-                    <label className="mb-1 block text-sm font-medium text-gray-700">
-                      Возраст ребёнка *
-                    </label>
+                    <label className="mb-1 block text-sm font-medium text-gray-700">Возраст ребёнка *</label>
                     <input
                       type="number"
                       min={1}
                       max={18}
                       value={form.childAge}
-                      onChange={(e) =>
-                        setForm((f) => ({ ...f, childAge: e.target.value }))
-                      }
+                      onChange={(e) => setForm((f) => ({ ...f, childAge: e.target.value }))}
                       className="w-full rounded-lg border border-gray-200 px-3 py-2.5 text-sm text-gray-900 outline-none transition-colors focus:border-indigo-400 focus:ring-2 focus:ring-indigo-100"
                       placeholder="Возраст"
                     />
                   </div>
+                  <div className="border-t border-gray-100 pt-4">
+                    <p className="mb-3 text-sm font-semibold text-gray-800">Ваши контактные данные</p>
+                    <div className="space-y-3">
+                      <div>
+                        <label className="mb-1 block text-sm font-medium text-gray-700">Ваше имя *</label>
+                        <input
+                          type="text"
+                          value={form.parentName}
+                          onChange={(e) => setForm((f) => ({ ...f, parentName: e.target.value }))}
+                          className="w-full rounded-lg border border-gray-200 px-3 py-2.5 text-sm text-gray-900 outline-none transition-colors focus:border-indigo-400 focus:ring-2 focus:ring-indigo-100"
+                          placeholder="Ваше имя"
+                        />
+                      </div>
+                      <div>
+                        <label className="mb-1 block text-sm font-medium text-gray-700">Телефон *</label>
+                        <input
+                          type="tel"
+                          value={form.parentPhone}
+                          onChange={(e) => setForm((f) => ({ ...f, parentPhone: e.target.value }))}
+                          className="w-full rounded-lg border border-gray-200 px-3 py-2.5 text-sm text-gray-900 outline-none transition-colors focus:border-indigo-400 focus:ring-2 focus:ring-indigo-100"
+                          placeholder="+7 (___) ___-__-__"
+                        />
+                      </div>
+                      <div>
+                        <label className="mb-1 block text-sm font-medium text-gray-700">Email *</label>
+                        <input
+                          type="email"
+                          value={form.parentEmail}
+                          onChange={(e) => setForm((f) => ({ ...f, parentEmail: e.target.value }))}
+                          className="w-full rounded-lg border border-gray-200 px-3 py-2.5 text-sm text-gray-900 outline-none transition-colors focus:border-indigo-400 focus:ring-2 focus:ring-indigo-100"
+                          placeholder="email@example.com"
+                        />
+                      </div>
+                    </div>
+                  </div>
                   <div>
-                    <label className="mb-1 block text-sm font-medium text-gray-700">
-                      Примечания
-                    </label>
+                    <label className="mb-1 block text-sm font-medium text-gray-700">Примечания</label>
                     <textarea
                       value={form.notes}
-                      onChange={(e) =>
-                        setForm((f) => ({ ...f, notes: e.target.value }))
-                      }
+                      onChange={(e) => setForm((f) => ({ ...f, notes: e.target.value }))}
                       rows={3}
                       className="w-full rounded-lg border border-gray-200 px-3 py-2.5 text-sm text-gray-900 outline-none transition-colors focus:border-indigo-400 focus:ring-2 focus:ring-indigo-100"
                       placeholder="Дополнительная информация"

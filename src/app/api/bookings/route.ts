@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import prisma from "@/lib/prisma";
+import bcrypt from "bcryptjs";
 
 export async function GET() {
   try {
@@ -9,7 +10,7 @@ export async function GET() {
     if (!session?.user) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
-    if ((session.user as any).role !== "admin") {
+    if ((session.user as { role?: string }).role !== "admin") {
       return NextResponse.json({ error: "Forbidden" }, { status: 403 });
     }
 
@@ -18,7 +19,7 @@ export async function GET() {
       orderBy: { createdAt: "desc" },
     });
     return NextResponse.json(bookings);
-  } catch (error) {
+  } catch {
     return NextResponse.json({ error: "Failed to fetch bookings" }, { status: 500 });
   }
 }
@@ -26,10 +27,13 @@ export async function GET() {
 export async function POST(request: Request) {
   try {
     const body = await request.json();
-    const { userId, slotId, childName, childAge, notes, status } = body;
+    const { slotId, childName, childAge, notes, parentName, parentEmail, parentPhone } = body;
 
     if (!slotId || !childName || childAge == null) {
-      return NextResponse.json({ error: "slotId, childName, and childAge are required" }, { status: 400 });
+      return NextResponse.json(
+        { error: "slotId, childName, and childAge are required" },
+        { status: 400 }
+      );
     }
 
     const slot = await prisma.scheduleSlot.findUnique({ where: { id: slotId } });
@@ -43,34 +47,50 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: "No available seats" }, { status: 400 });
     }
 
-    const bookingData: any = {
-      slotId,
-      childName,
-      childAge,
-      notes,
-      status: status ?? "pending",
-    };
+    let userId: string;
 
-    if (userId) {
-      bookingData.userId = userId;
-    } else {
-      const session = await getServerSession(authOptions);
-      if (session?.user) {
-        bookingData.userId = (session.user as any).id;
+    const session = await getServerSession(authOptions);
+    if (session?.user) {
+      userId = (session.user as { id?: string }).id!;
+    } else if (parentEmail) {
+      const existing = await prisma.user.findUnique({ where: { email: parentEmail } });
+      if (existing) {
+        userId = existing.id;
       } else {
-        const guestUser = await prisma.user.findFirst({ where: { email: "guest@neuro.local" } });
-        if (!guestUser) {
-          const newGuest = await prisma.user.create({
-            data: { email: `guest-${Date.now()}@neuro.local`, name: childName, password: "guest", role: "guest" },
-          });
-          bookingData.userId = newGuest.id;
-        } else {
-          bookingData.userId = guestUser.id;
-        }
+        const hashed = await bcrypt.hash(Math.random().toString(36), 10);
+        const newUser = await prisma.user.create({
+          data: {
+            email: parentEmail,
+            name: parentName || childName,
+            password: hashed,
+            phone: parentPhone || null,
+            role: "parent",
+          },
+        });
+        userId = newUser.id;
+      }
+    } else {
+      const guestUser = await prisma.user.findFirst({ where: { email: "guest@neuro.local" } });
+      if (guestUser) {
+        userId = guestUser.id;
+      } else {
+        const newGuest = await prisma.user.create({
+          data: { email: "guest@neuro.local", name: "Гость", password: "guest", role: "guest" },
+        });
+        userId = newGuest.id;
       }
     }
 
-    const booking = await prisma.booking.create({ data: bookingData });
+    const booking = await prisma.booking.create({
+      data: {
+        userId,
+        slotId,
+        childName,
+        childAge: parseInt(childAge, 10),
+        notes: notes || null,
+        status: "pending",
+      },
+    });
 
     await prisma.scheduleSlot.update({
       where: { id: slotId },
@@ -78,7 +98,7 @@ export async function POST(request: Request) {
     });
 
     return NextResponse.json(booking, { status: 201 });
-  } catch (error) {
+  } catch {
     return NextResponse.json({ error: "Failed to create booking" }, { status: 500 });
   }
 }

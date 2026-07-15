@@ -1,0 +1,7 @@
+Репозиторий: https://github.com/altpluscgamer-art/neuro
+
+Стек: Next.js 16 + TypeScript + Tailwind CSS + Prisma 7 (SQLite) + NextAuth
+
+Запущенная тестовая версия: http://localhost:3000
+
+Данные для входа в админку: admin@neuro.ru / admin123 (заполнить БД: POST http://localhost:3000/api/admin/seed)

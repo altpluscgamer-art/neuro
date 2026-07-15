@@ -1082,13 +1082,14 @@ export default function ScreeningPage() {
             <ArrowRight className="h-5 w-5" />
           </Link>
           {reportId && (
-            <Link
+            <a
               href={`/api/screening/pdf/${reportId}`}
+              download
               className="inline-flex items-center gap-2 rounded-xl border-2 border-primary-200 bg-primary-50 px-8 py-3 text-base font-semibold text-primary-700 transition-colors hover:bg-primary-100"
             >
               <Download className="h-5 w-5" />
               Скачать PDF-отчёт
-            </Link>
+            </a>
           )}
           <button
             type="button"
