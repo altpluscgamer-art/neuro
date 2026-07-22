@@ -262,6 +262,78 @@ npm test
 npm run build
 ```
 
+## Деплой на свой сервер (Linux + Nginx + SSL)
+
+Файлы: `deploy-server.sh`, `nginx.conf`, `neuro.service`, `setup-telegram-bot.sh`
+
+### Шаг 1 — Подготовка сервера
+
+SSH на сервер:
+```bash
+ssh root@138.226.220.143
+```
+
+### Шаг 2 — Загрузка проекта
+
+```bash
+cd /opt
+git clone https://github.com/altpluscgamer-art/neuro.git
+cd neuro
+```
+
+Или загрузите файлы через SCP/SFTP.
+
+### Шаг 3 — Запуск деплоя
+
+```bash
+sudo bash deploy-server.sh
+```
+
+Скрипт автоматически:
+1. Установит Node.js 22
+2. Установит Nginx + Certbot (Let's Encrypt)
+3. Установит PM2 (менеджер процессов)
+4. Установит зависимости и соберёт проект
+5. Создаст `.env` с production URL (`https://mybestsite.com.ng`)
+6. Запустит приложение через PM2
+7. Настроит Nginx как reverse proxy (80 → 3000)
+8. Получит SSL-сертификат Let's Encrypt
+9. Заполнит БД тестовыми данными
+
+### Шаг 4 — Настройка Telegram-бота
+
+1. Откройте `https://mybestsite.com.ng/auth/login`
+2. Войдите: `admin@neuro.ru` / `admin123`
+3. Перейдите в **Настройки → Telegram**
+4. Вставьте **Bot Token** (от @BotFather)
+5. Вставьте **Chat ID** (от @userinfobot)
+6. Включите **Авто-синхронизация**
+7. Откройте в браузере: `https://mybestsite.com.ng/api/telegram/webhook`
+8. Откройте вашего бота в Telegram → отправьте `/start`
+
+### Управление на сервере
+
+```bash
+pm2 status           # статус приложения
+pm2 logs neuro       # логи
+pm2 restart neuro    # перезапуск
+pm2 stop neuro       # остановка
+nginx -t              # проверить конфиг Nginx
+systemctl reload nginx  # перезагрузить Nginx
+```
+
+### VPN и сайт параллельно
+
+VPN использует свои порты (обычно 51820 для WireGuard, 1194 для OpenVPN). Сайт работает на портах 80 (HTTP) и 443 (HTTPS). Они не конфликтуют — оба работают одновременно.
+
+### Домен и DNS
+
+Убедитесь что DNS-записи `mybestsite.com.ng` и `www.mybestsite.com.ng` указывают на `138.226.220.143`:
+```
+A    mybestsite.com.ng      138.226.220.143
+A    www.mybestsite.com.ng  138.226.220.143
+```
+
 ## Деплой на Vercel + PostgreSQL
 
 1. Создайте проект на Vercel, подключите GitHub-репозиторий
