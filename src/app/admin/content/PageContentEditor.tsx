@@ -1,18 +1,35 @@
 "use client";
 
-import { useState, useEffect, useCallback } from "react";
-import { Save, Loader2, Home, User, BookOpen, Phone } from "lucide-react";
+import { useState, useEffect } from "react";
+import { Save, Loader2, Home, User, BookOpen, Phone, Calendar, FileText, Shield, ClipboardList, Video } from "lucide-react";
 import { clsx } from "clsx";
 
-type PageTab = "home" | "about" | "contacts";
+type PageTab =
+  | "home"
+  | "about"
+  | "services"
+  | "materials"
+  | "courses"
+  | "screening"
+  | "booking"
+  | "contacts"
+  | "legal";
 
 const tabs: { id: PageTab; label: string; icon: typeof Home }[] = [
   { id: "home", label: "Главная", icon: Home },
   { id: "about", label: "Обо мне", icon: User },
+  { id: "services", label: "Услуги", icon: Shield },
+  { id: "materials", label: "Материалы", icon: BookOpen },
+  { id: "courses", label: "Курсы", icon: Video },
+  { id: "screening", label: "Анкета", icon: ClipboardList },
+  { id: "booking", label: "Запись", icon: Calendar },
   { id: "contacts", label: "Контакты", icon: Phone },
+  { id: "legal", label: "Правовые", icon: FileText },
 ];
 
-const fieldDefs: Record<PageTab, { key: string; label: string; type?: "text" | "textarea"; placeholder?: string }[]> = {
+type FieldDef = { key: string; label: string; type?: "text" | "textarea"; placeholder?: string };
+
+const fieldDefs: Record<PageTab, FieldDef[]> = {
   home: [
     { key: "page_home_badge", label: "Бейдж в hero", type: "text", placeholder: "Нейропсихологическая помощь детям" },
     { key: "page_home_title", label: "Заголовок (H1)", type: "text", placeholder: "Помогаем детям развиваться, а родителям — понимать" },
@@ -32,7 +49,7 @@ const fieldDefs: Record<PageTab, { key: string; label: string; type?: "text" | "
   about: [
     { key: "page_about_title", label: "Заголовок", type: "text", placeholder: "Обо мне" },
     { key: "page_about_subtitle", label: "Подзаголовок", type: "textarea", placeholder: "Квалифицированный детский нейропсихолог..." },
-    { key: "page_about_text1", label: "Абзац 1", type: "textarea", placeholder: "Я — детский нейропсихолог и педагог раннего развития..." },
+    { key: "page_about_text1", label: "Абзац 1", type: "textarea", placeholder: "Я — детский нейропсихолог..." },
     { key: "page_about_text2", label: "Абзац 2", type: "textarea", placeholder: "Работаю с детьми от 1 до 13 лет..." },
     { key: "page_about_text3", label: "Абзац 3", type: "textarea", placeholder: "Использую методику А.Р. Лурии..." },
     { key: "page_about_stat1_label", label: "Статистика 1 — название", type: "text", placeholder: "Опыт работы" },
@@ -52,6 +69,36 @@ const fieldDefs: Record<PageTab, { key: string; label: string; type?: "text" | "
     { key: "page_about_principle4_title", label: "Принцип 4 — название", type: "text", placeholder: "Поддержка родителей" },
     { key: "page_about_principle4_desc", label: "Принцип 4 — описание", type: "textarea", placeholder: "Я помогаю не только детям..." },
   ],
+  services: [
+    { key: "page_services_title", label: "Заголовок", type: "text", placeholder: "Услуги" },
+    { key: "page_services_subtitle", label: "Подзаголовок", type: "text", placeholder: "Комплексный подход к развитию и поддержке вашего ребёнка" },
+    { key: "page_services_step1_title", label: "Шаг 1 — название", type: "text", placeholder: "Диагностика" },
+    { key: "page_services_step1_desc", label: "Шаг 1 — описание", type: "textarea", placeholder: "Выявляем сильные и слабые стороны" },
+    { key: "page_services_step2_title", label: "Шаг 2 — название", type: "text", placeholder: "План" },
+    { key: "page_services_step2_desc", label: "Шаг 2 — описание", type: "textarea", placeholder: "Составляем индивидуальный маршрут" },
+    { key: "page_services_step3_title", label: "Шаг 3 — название", type: "text", placeholder: "Занятия" },
+    { key: "page_services_step3_desc", label: "Шаг 3 — описание", type: "textarea", placeholder: "Игровая нейрокоррекция" },
+    { key: "page_services_step4_title", label: "Шаг 4 — название", type: "text", placeholder: "Поддержка" },
+    { key: "page_services_step4_desc", label: "Шаг 4 — описание", type: "textarea", placeholder: "Рекомендации для родителей" },
+  ],
+  materials: [
+    { key: "page_materials_title", label: "Заголовок", type: "text", placeholder: "Материалы" },
+    { key: "page_materials_subtitle", label: "Подзаголовок", type: "text", placeholder: "Статьи о развитии детей, нейропсихологии и практических рекомендациях" },
+  ],
+  courses: [
+    { key: "page_courses_title", label: "Заголовок", type: "text", placeholder: "Курсы" },
+    { key: "page_courses_subtitle", label: "Подзаголовок", type: "text", placeholder: "Видео-курсы с практическими упражнениями для развития ребёнка" },
+  ],
+  screening: [
+    { key: "page_screening_title", label: "Заголовок", type: "text", placeholder: "Скрининг развития ребёнка" },
+    { key: "page_screening_subtitle", label: "Подзаголовок", type: "textarea", placeholder: "Ответьте на несколько вопросов, чтобы получить персональные рекомендации..." },
+    { key: "page_screening_time", label: "Время прохождения", type: "text", placeholder: "5–7 минут" },
+    { key: "page_screening_disclaimer", label: "Дисклеймер", type: "textarea", placeholder: "Это не диагностика и не медицинское заключение..." },
+  ],
+  booking: [
+    { key: "page_booking_title", label: "Заголовок", type: "text", placeholder: "Расписание" },
+    { key: "page_booking_subtitle", label: "Подзаголовок", type: "text", placeholder: "Выберите удобное время для консультации или занятия" },
+  ],
   contacts: [
     { key: "site_phone", label: "Телефон", type: "text", placeholder: "+7 (999) 123-45-67" },
     { key: "site_email", label: "Email", type: "text", placeholder: "info@neuro.ru" },
@@ -62,6 +109,10 @@ const fieldDefs: Record<PageTab, { key: string; label: string; type?: "text" | "
     { key: "social_whatsapp", label: "WhatsApp", type: "text", placeholder: "https://wa.me/..." },
     { key: "social_vk", label: "ВКонтакте", type: "text", placeholder: "https://vk.com/..." },
     { key: "social_youtube", label: "YouTube", type: "text", placeholder: "https://youtube.com/..." },
+  ],
+  legal: [
+    { key: "page_privacy_title", label: "Заголовок политики конфиденциальности", type: "text", placeholder: "Политика конфиденциальности" },
+    { key: "page_terms_title", label: "Заголовок пользовательского соглашения", type: "text", placeholder: "Пользовательское соглашение" },
   ],
 };
 
@@ -123,10 +174,11 @@ export default function PageContentEditor() {
     <div className="space-y-6">
       <div>
         <h2 className="text-lg font-semibold text-gray-900">Редактирование страниц</h2>
-        <p className="text-sm text-gray-500">Текстовые блоки, заголовки и описания на страницах сайта</p>
+        <p className="text-sm text-gray-500">Текстовые блоки, заголовки и описания на всех страницах сайта</p>
       </div>
 
-      <div className="flex gap-1 rounded-lg bg-gray-100 p-1">
+      {/* Tab navigation — scrollable on mobile */}
+      <div className="flex gap-1 overflow-x-auto rounded-lg bg-gray-100 p-1">
         {tabs.map((tab) => {
           const Icon = tab.icon;
           return (
@@ -134,7 +186,7 @@ export default function PageContentEditor() {
               key={tab.id}
               onClick={() => { setActiveTab(tab.id); setMessage(null); }}
               className={clsx(
-                "flex flex-1 items-center justify-center gap-2 rounded-md px-3 py-2 text-sm font-medium transition-colors",
+                "flex shrink-0 items-center gap-2 rounded-md px-3 py-2 text-sm font-medium transition-colors",
                 activeTab === tab.id ? "bg-white text-gray-900 shadow-sm" : "text-gray-500 hover:text-gray-700"
               )}
               style={{ minHeight: "40px" }}

@@ -3,6 +3,7 @@ import Link from "next/link";
 import SEOHead from "@/components/SEOHead";
 import ExternalReviews from "@/components/ExternalReviews";
 import { getAllSettings } from "@/lib/settings";
+import { getPageContent, getOr } from "@/lib/page-content";
 import {
   GraduationCap,
   Award,
@@ -31,36 +32,6 @@ export const metadata: Metadata = {
   },
 };
 
-const stats = [
-  { icon: Clock, value: "10+ лет", label: "Опыт работы" },
-  { icon: Users, value: "500+", label: "Детей помогли" },
-  { icon: BookOpen, value: "15+", label: "Методик" },
-  { icon: Award, value: "10", label: "Лет практики" },
-];
-
-const principles = [
-  {
-    icon: Users,
-    title: "Индивидуальный подход",
-    desc: "Каждая программа составляется с учётом особенностей, потребностей и темпа конкретного ребёнка.",
-  },
-  {
-    icon: BookOpen,
-    title: "Научная база",
-    desc: "Работа строится на методике А.Р. Лурии и современных исследованиях в области нейропсихологии.",
-  },
-  {
-    icon: Heart,
-    title: "Игровая форма",
-    desc: "Занятия проходят в игровой форме — ребёнку интересно и комфортно, а развитие происходит естественно.",
-  },
-  {
-    icon: Shield,
-    title: "Поддержка родителей",
-    desc: "Объясняю результаты диагностики и даю конкретные рекомендации, чтобы семья могла помогать дома.",
-  },
-];
-
 const socialKeys = [
   { key: "social_instagram", icon: ExternalLink, label: "Instagram" },
   { key: "social_telegram", icon: Send, label: "Telegram" },
@@ -71,7 +42,38 @@ const socialKeys = [
 
 export default async function AboutPage() {
   const settings = await getAllSettings();
+  const pc = await getPageContent();
   const activeSocials = socialKeys.filter((s) => settings[s.key]);
+
+  const stats = [
+    { icon: Clock, value: getOr(pc, "page_about_stat1_value", "10+ лет"), label: getOr(pc, "page_about_stat1_label", "Опыт работы") },
+    { icon: Users, value: getOr(pc, "page_about_stat2_value", "500+"), label: getOr(pc, "page_about_stat2_label", "Детей помогли") },
+    { icon: BookOpen, value: getOr(pc, "page_about_stat3_value", "15+"), label: getOr(pc, "page_about_stat3_label", "Методик") },
+    { icon: Award, value: getOr(pc, "page_about_stat4_value", "10"), label: getOr(pc, "page_about_stat4_label", "Лет практики") },
+  ];
+
+  const principles = [
+    {
+      icon: Users,
+      title: getOr(pc, "page_about_principle1_title", "Индивидуальный подход"),
+      desc: getOr(pc, "page_about_principle1_desc", "Каждая программа составляется с учётом особенностей, потребностей и темпа конкретного ребёнка."),
+    },
+    {
+      icon: BookOpen,
+      title: getOr(pc, "page_about_principle2_title", "Научная база"),
+      desc: getOr(pc, "page_about_principle2_desc", "Работа строится на методике А.Р. Лурии и современных исследованиях в области нейропсихологии."),
+    },
+    {
+      icon: Heart,
+      title: getOr(pc, "page_about_principle3_title", "Игровая форма"),
+      desc: getOr(pc, "page_about_principle3_desc", "Занятия проходят в игровой форме — ребёнку интересно и комфортно, а развитие происходит естественно."),
+    },
+    {
+      icon: Shield,
+      title: getOr(pc, "page_about_principle4_title", "Поддержка родителей"),
+      desc: getOr(pc, "page_about_principle4_desc", "Объясняю результаты диагностики и даю конкретные рекомендации, чтобы семья могла помогать дома."),
+    },
+  ];
 
   return (
     <>
@@ -110,11 +112,10 @@ export default async function AboutPage() {
               Детский нейропсихолог
             </div>
             <h1 className="text-4xl font-bold tracking-tight text-primary-950 sm:text-5xl">
-              Обо мне
+              {getOr(pc, "page_about_title", "Обо мне")}
             </h1>
             <p className="mt-6 text-lg leading-relaxed text-gray-600">
-              Помогаю детям развиваться, а родителям&nbsp;&mdash; понимать
-              особенности своего ребёнка и уверенно его поддерживать.
+              {getOr(pc, "page_about_subtitle", "Помогаю детям развиваться, а родителям — понимать особенности своего ребёнка и уверенно его поддерживать.")}
             </p>
           </div>
         </div>
@@ -124,29 +125,13 @@ export default async function AboutPage() {
         <div className="mx-auto max-w-3xl px-4 sm:px-6 lg:px-8">
           <div className="space-y-6 text-lg leading-relaxed text-gray-600">
             <p>
-              Меня зовут{" "}
-              <span className="font-semibold text-primary-800">
-                Мария Иванова
-              </span>{" "}
-              &mdash; детский нейропсихолог. Каждый день я вижу, как правильно
-              подобранная поддержка помогает детям раскрыть свои способности,
-              стать увереннее и успешнее.
+              {getOr(pc, "page_about_text1", "Меня зовут Мария Иванова — детский нейропсихолог. Каждый день я вижу, как правильно подобранная поддержка помогает детям раскрыть свои способности, стать увереннее и успешнее.")}
             </p>
             <p>
-              Я работаю с детьми от 1 до 13 лет, опираясь на
-              нейропсихологическую методику{" "}
-              <span className="font-semibold text-primary-800">
-                А.Р. Лурии
-              </span>
-              . Этот подход позволяет точно определить, какие именно функции
-              мозга нуждаются в развитии, и выстроить работу от сильных сторон
-              ребёнка, а не от его трудностей.
+              {getOr(pc, "page_about_text2", "Я работаю с детьми от 1 до 13 лет, опираясь на нейропсихологическую методику А.Р. Лурии. Этот подход позволяет точно определить, какие именно функции мозга нуждаются в развитии, и выстроить работу от сильных сторон ребёнка, а не от его трудностей.")}
             </p>
             <p>
-              Занятия проходят в игровой форме&nbsp;&mdash; дети воспринимают их
-              как увлекательное приключение, а не как лечение. Я внимательно
-              изучаю особенности каждого ребёнка и обязательно поддерживаю
-              родителей, объясняя, что происходит и как помогать дома.
+              {getOr(pc, "page_about_text3", "Занятия проходят в игровой форме — дети воспринимают их как увлекательное приключение, а не как лечение. Я внимательно изучаю особенности каждого ребёнка и обязательно поддерживаю родителей, объясняя, что происходит и как помогать дома.")}
             </p>
           </div>
         </div>

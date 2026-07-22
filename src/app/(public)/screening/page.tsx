@@ -1,6 +1,7 @@
 import { Suspense } from "react";
 import { Brain, ChevronRight, Heart, AlertCircle, BookOpen } from "lucide-react";
 import ScreeningClient from "./ScreeningClient";
+import { getPageContent, getOr } from "@/lib/page-content";
 
 export const metadata = {
   title: "Анкета — скрининг развития ребёнка",
@@ -8,7 +9,9 @@ export const metadata = {
     "Бесплатная онлайн-анкета для родителей. Получите персональные рекомендации по развитию ребёнка на основе нейропсихологической методики А.Р. Лурии.",
 };
 
-export default function ScreeningPage() {
+export default async function ScreeningPage() {
+  const pc = await getPageContent();
+
   return (
     <div className="min-h-screen bg-gradient-to-b from-primary-50 via-white to-white">
       <div className="mx-auto max-w-2xl px-4 py-8 sm:py-12">
@@ -20,11 +23,10 @@ export default function ScreeningPage() {
                   <Brain className="h-10 w-10 text-primary-600" />
                 </div>
                 <h1 className="mb-4 text-2xl font-bold text-gray-900 sm:text-3xl">
-                  Скрининг развития ребёнка
+                  {getOr(pc, "page_screening_title", "Скрининг развития ребёнка")}
                 </h1>
                 <p className="mb-6 max-w-md text-base leading-relaxed text-gray-600">
-                  Ответьте на несколько вопросов, чтобы получить персональные
-                  рекомендации по развитию ребёнка.
+                  {getOr(pc, "page_screening_subtitle", "Ответьте на несколько вопросов, чтобы получить персональные рекомендации по развитию ребёнка.")}
                 </p>
                 <div className="mb-6 flex flex-wrap items-center justify-center gap-3">
                   <span className="inline-flex items-center gap-1.5 rounded-full bg-primary-50 px-3 py-1.5 text-sm font-medium text-primary-700">

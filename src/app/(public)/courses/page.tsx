@@ -2,6 +2,7 @@ import Link from "next/link";
 import Image from "next/image";
 import prisma from "@/lib/prisma";
 import { Video, Play, Clock, BookOpen } from "lucide-react";
+import { getPageContent, getOr } from "@/lib/page-content";
 
 export const metadata = {
   title: "Курсы — Нейропсихолог онлайн",
@@ -13,6 +14,7 @@ export default async function CoursesPage() {
     where: { isPublished: true },
     orderBy: { createdAt: "desc" },
   });
+  const pc = await getPageContent();
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-primary-50/40 to-white">
@@ -23,10 +25,10 @@ export default async function CoursesPage() {
             Обучение
           </div>
           <h1 className="text-4xl font-bold tracking-tight text-gray-900">
-            Онлайн-курсы
+            {getOr(pc, "page_courses_title", "Курсы")}
           </h1>
           <p className="mt-3 text-lg text-gray-600">
-            Профессиональные курсы для родителей и специалистов
+            {getOr(pc, "page_courses_subtitle", "Профессиональные курсы для родителей и специалистов")}
           </p>
         </div>
 

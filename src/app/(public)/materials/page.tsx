@@ -1,6 +1,7 @@
 import Link from "next/link";
 import prisma from "@/lib/prisma";
 import { BookOpen, Search, Tag, Send, Video } from "lucide-react";
+import { getPageContent, getOr } from "@/lib/page-content";
 
 export const metadata = {
   title: "Материалы — Нейропсихолог онлайн",
@@ -47,6 +48,8 @@ export default async function MaterialsPage({
     .map((s) => s.source)
     .filter(Boolean) as string[];
 
+  const pc = await getPageContent();
+
   return (
     <div className="min-h-screen bg-gradient-to-b from-primary-50/40 to-white">
       <div className="mx-auto max-w-6xl px-4 py-16 sm:px-6 lg:px-8">
@@ -56,10 +59,10 @@ export default async function MaterialsPage({
             Библиотека знаний
           </div>
           <h1 className="text-4xl font-bold tracking-tight text-gray-900">
-            Материалы для родителей
+            {getOr(pc, "page_materials_title", "Материалы")}
           </h1>
           <p className="mt-3 text-lg text-gray-600">
-            Полезные статьи о развитии, воспитании и нейропсихологии детей
+            {getOr(pc, "page_materials_subtitle", "Полезные статьи о развитии, воспитании и нейропсихологии детей")}
           </p>
         </div>
 

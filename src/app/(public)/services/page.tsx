@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import prisma from "@/lib/prisma";
 import SEOHead from "@/components/SEOHead";
+import { getPageContent, getOr } from "@/lib/page-content";
 import {
   Brain,
   Sparkles,
@@ -54,29 +55,6 @@ type ServiceRow = {
   updatedAt: Date;
 };
 
-const steps = [
-  {
-    number: "1",
-    title: "Диагностика",
-    desc: "Выявляем сильные и слабые стороны развития ребёнка с помощью нейропсихологических проб.",
-  },
-  {
-    number: "2",
-    title: "План",
-    desc: "Составляем индивидуальный маршрут коррекции и развития с учётом результатов диагностики.",
-  },
-  {
-    number: "3",
-    title: "Занятия",
-    desc: "Проводим игровую нейрокоррекцию — ребёнок развивается через увлекательные задания.",
-  },
-  {
-    number: "4",
-    title: "Поддержка",
-    desc: "Даём рекомендации для родителей, чтобы закреплять результат и помогать ребёнку дома.",
-  },
-];
-
 // TODO(Issue #15): Create /services/[slug] detail pages for each service.
 // Currently service cards link directly to /booking; individual service pages
 // would improve SEO and let users learn more before booking.
@@ -85,6 +63,30 @@ export default async function ServicesPage() {
     where: { isActive: true },
     orderBy: { order: "asc" },
   });
+  const pc = await getPageContent();
+
+  const steps = [
+    {
+      number: "1",
+      title: getOr(pc, "page_services_step1_title", "Диагностика"),
+      desc: getOr(pc, "page_services_step1_desc", "Выявляем сильные и слабые стороны развития ребёнка с помощью нейропсихологических проб."),
+    },
+    {
+      number: "2",
+      title: getOr(pc, "page_services_step2_title", "План"),
+      desc: getOr(pc, "page_services_step2_desc", "Составляем индивидуальный маршрут коррекции и развития с учётом результатов диагностики."),
+    },
+    {
+      number: "3",
+      title: getOr(pc, "page_services_step3_title", "Занятия"),
+      desc: getOr(pc, "page_services_step3_desc", "Проводим игровую нейрокоррекцию — ребёнок развивается через увлекательные задания."),
+    },
+    {
+      number: "4",
+      title: getOr(pc, "page_services_step4_title", "Поддержка"),
+      desc: getOr(pc, "page_services_step4_desc", "Даём рекомендации для родителей, чтобы закреплять результат и помогать ребёнку дома."),
+    },
+  ];
 
   return (
     <>
@@ -100,10 +102,10 @@ export default async function ServicesPage() {
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
           <div className="mx-auto max-w-2xl text-center">
             <h1 className="text-4xl font-bold tracking-tight text-primary-950 sm:text-5xl">
-              Услуги
+              {getOr(pc, "page_services_title", "Услуги")}
             </h1>
             <p className="mt-6 text-lg leading-relaxed text-gray-600">
-              Комплексный подход к развитию и поддержке вашего ребёнка
+              {getOr(pc, "page_services_subtitle", "Комплексный подход к развитию и поддержке вашего ребёнка")}
             </p>
           </div>
         </div>

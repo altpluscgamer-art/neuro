@@ -1,13 +1,16 @@
 import { Suspense } from "react";
 import { Calendar } from "lucide-react";
 import BookingClient from "./BookingClient";
+import { getPageContent, getOr } from "@/lib/page-content";
 
 export const metadata = {
   title: "Запись на приём",
   description: "Выберите удобное время для консультации или занятия",
 };
 
-export default function BookingPage() {
+export default async function BookingPage() {
+  const pc = await getPageContent();
+
   return (
     <div className="min-h-screen bg-gradient-to-b from-primary-50/40 to-white">
       <div className="mx-auto max-w-4xl px-4 py-8 sm:px-6 sm:py-16 lg:px-8">
@@ -17,10 +20,10 @@ export default function BookingPage() {
             Запись на приём
           </div>
           <h1 className="text-3xl font-bold tracking-tight text-gray-900 sm:text-4xl">
-            Расписание
+            {getOr(pc, "page_booking_title", "Расписание")}
           </h1>
           <p className="mt-3 text-lg text-gray-600">
-            Выберите удобное время для консультации или занятия
+            {getOr(pc, "page_booking_subtitle", "Выберите удобное время для консультации или занятия")}
           </p>
         </div>
         <Suspense
