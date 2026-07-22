@@ -361,7 +361,7 @@ function ScreeningPageInner() {
                       completed && "bg-primary-600 text-white",
                       current &&
                         "bg-primary-100 text-primary-700 ring-2 ring-primary-600",
-                      !completed && !current && "bg-gray-100 text-gray-400"
+                      !completed && !current && "bg-gray-100 text-gray-500"
                     )}
                   >
                     {completed ? (
@@ -377,7 +377,7 @@ function ScreeningPageInner() {
                         ? "text-primary-700"
                         : completed
                           ? "text-primary-600"
-                          : "text-gray-400"
+                          : "text-gray-500"
                     )}
                   >
                     {label}
@@ -683,7 +683,7 @@ function ScreeningPageInner() {
         <div>
           <label className="mb-1.5 block text-sm font-medium text-gray-700">
             <span className="inline-flex items-center gap-1.5">
-              <Phone className="h-3.5 w-3.5 text-gray-400" />
+              <Phone className="h-3.5 w-3.5 text-gray-500" />
               Телефон
             </span>
           </label>
@@ -712,7 +712,7 @@ function ScreeningPageInner() {
         <div>
           <label className="mb-1.5 block text-sm font-medium text-gray-700">
             <span className="inline-flex items-center gap-1.5">
-              <Mail className="h-3.5 w-3.5 text-gray-400" />
+              <Mail className="h-3.5 w-3.5 text-gray-500" />
               Email
             </span>
           </label>
@@ -828,7 +828,7 @@ function ScreeningPageInner() {
                         style={{ width: `${style.healthPct}%` }}
                       />
                     </div>
-                    <p className="mt-1 text-xs text-gray-400">
+                    <p className="mt-1 text-xs text-gray-500">
                       {block.score} / {block.maxScore}
                     </p>
                   </div>
@@ -876,7 +876,7 @@ function ScreeningPageInner() {
                       >
                         {sev.label}
                       </span>
-                      <span className="text-xs text-gray-400">
+                      <span className="text-xs text-gray-500">
                         Блок {syndrome.block}
                       </span>
                     </div>

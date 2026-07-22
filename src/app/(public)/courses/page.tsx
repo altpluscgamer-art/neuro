@@ -1,4 +1,5 @@
 import Link from "next/link";
+import Image from "next/image";
 import prisma from "@/lib/prisma";
 import { Video, Play, Clock, BookOpen } from "lucide-react";
 
@@ -14,7 +15,7 @@ export default async function CoursesPage() {
   });
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-indigo-50/40 to-white">
+    <div className="min-h-screen bg-gradient-to-b from-primary-50/40 to-white">
       <div className="mx-auto max-w-6xl px-4 py-16 sm:px-6 lg:px-8">
         <div className="mb-12 text-center">
           <div className="mb-4 inline-flex items-center gap-2 rounded-full bg-violet-100 px-4 py-1.5 text-sm font-medium text-violet-700">
@@ -44,18 +45,20 @@ export default async function CoursesPage() {
                 href={`/courses/${course.slug}`}
                 className="group flex flex-col overflow-hidden rounded-2xl border border-gray-100 bg-white shadow-sm transition-all hover:shadow-md hover:-translate-y-0.5"
               >
-                <div className="relative flex h-52 items-center justify-center bg-gradient-to-br from-violet-100 to-indigo-100">
+                <div className="relative flex h-52 items-center justify-center bg-gradient-to-br from-violet-100 to-primary-100">
                   <Play className="h-14 w-14 text-violet-300 transition-colors group-hover:text-violet-400" />
                   {course.image && (
-                    <img
+                    <Image
                       src={course.image}
                       alt={course.title}
-                      className="absolute inset-0 h-full w-full object-cover"
+                      width={400}
+                      height={300}
+                      className="absolute inset-0 h-full w-full rounded-xl object-cover"
                     />
                   )}
                 </div>
                 <div className="flex flex-1 flex-col p-5">
-                  <h2 className="mb-2 text-xl font-semibold text-gray-900 group-hover:text-indigo-600 transition-colors">
+                  <h2 className="mb-2 text-xl font-semibold text-gray-900 group-hover:text-primary-600 transition-colors">
                     {course.title}
                   </h2>
                   <p className="mb-4 flex-1 text-sm leading-relaxed text-gray-600 line-clamp-3">
@@ -73,7 +76,7 @@ export default async function CoursesPage() {
                             : "уроков"}
                       </span>
                     </div>
-                    <span className="text-lg font-bold text-indigo-600">
+                    <span className="text-lg font-bold text-primary-600">
                       {course.price > 0
                         ? `${course.price.toLocaleString("ru-RU")} ₽`
                         : "Бесплатно"}
@@ -85,8 +88,8 @@ export default async function CoursesPage() {
           </div>
         )}
 
-        <div className="mt-16 rounded-2xl border border-gray-100 bg-gradient-to-br from-indigo-50 to-white p-8 text-center">
-          <BookOpen className="mx-auto mb-4 h-10 w-10 text-indigo-600" />
+        <div className="mt-16 rounded-2xl border border-gray-100 bg-gradient-to-br from-primary-50 to-white p-8 text-center">
+          <BookOpen className="mx-auto mb-4 h-10 w-10 text-primary-600" />
           <h2 className="mb-2 text-xl font-bold text-gray-900">
             Читайте также наши статьи
           </h2>
@@ -95,7 +98,7 @@ export default async function CoursesPage() {
           </p>
           <Link
             href="/materials"
-            className="inline-flex items-center gap-2 rounded-xl bg-indigo-600 px-6 py-3 text-base font-semibold text-white shadow-sm transition-colors hover:bg-indigo-700"
+            className="inline-flex items-center gap-2 rounded-xl bg-primary-600 px-6 py-3 text-base font-semibold text-white shadow-sm transition-colors hover:bg-primary-700"
           >
             <BookOpen className="h-5 w-5" />
             Перейти к материалам

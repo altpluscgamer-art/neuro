@@ -16,7 +16,7 @@ export default function Breadcrumbs({ items }: { items: BreadcrumbItem[] }) {
           ) : (
             <span className="font-medium text-gray-700">{item.label}</span>
           )}
-          {i < items.length - 1 && <ChevronRight className="h-3 w-3 text-gray-400" />}
+          {i < items.length - 1 && <ChevronRight className="h-3 w-3 text-gray-500" />}
         </div>
       ))}
     </nav>

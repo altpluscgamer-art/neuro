@@ -91,17 +91,17 @@ export default function BookingWidget({
 
   if (loading) {
     return (
-      <div className="animate-pulse space-y-3 rounded-xl border border-indigo-100 bg-white p-4">
-        <div className="h-5 w-40 rounded bg-indigo-100" />
-        <div className="h-20 rounded bg-indigo-50" />
-        <div className="h-20 rounded bg-indigo-50" />
+      <div className="animate-pulse space-y-3 rounded-xl border border-primary-100 bg-white p-4">
+        <div className="h-5 w-40 rounded bg-primary-100" />
+        <div className="h-20 rounded bg-primary-50" />
+        <div className="h-20 rounded bg-primary-50" />
       </div>
     );
   }
 
   if (slots.length === 0) {
     return (
-      <div className="rounded-xl border border-indigo-100 bg-white p-4 text-center text-sm text-gray-500">
+      <div className="rounded-xl border border-primary-100 bg-white p-4 text-center text-sm text-gray-500">
         Нет доступных слотов для записи
       </div>
     );
@@ -109,8 +109,8 @@ export default function BookingWidget({
 
   return (
     <>
-      <div className="rounded-xl border border-indigo-100 bg-white p-4">
-        <h3 className="mb-3 text-sm font-semibold text-indigo-900">
+      <div className="rounded-xl border border-primary-100 bg-white p-4">
+        <h3 className="mb-3 text-sm font-semibold text-primary-900">
           {title}
         </h3>
         <div className="space-y-2">
@@ -121,10 +121,10 @@ export default function BookingWidget({
                 key={slot.id}
                 type="button"
                 onClick={() => setSelectedSlot(slot)}
-                className="w-full rounded-lg border border-indigo-100 bg-indigo-50/50 p-3 text-left transition-colors hover:border-indigo-300 hover:bg-indigo-50"
+                className="w-full rounded-lg border border-primary-100 bg-primary-50/50 p-3 text-left transition-colors hover:border-primary-300 hover:bg-primary-50"
               >
-                <div className="mb-1 flex items-center gap-2 text-sm font-medium text-indigo-900">
-                  <Calendar className="h-3.5 w-3.5 text-indigo-500" />
+                <div className="mb-1 flex items-center gap-2 text-sm font-medium text-primary-900">
+                  <Calendar className="h-3.5 w-3.5 text-primary-500" />
                   {slot.title || slot.date}
                 </div>
                 <div className="flex items-center gap-3 text-xs text-gray-600">
@@ -161,7 +161,7 @@ export default function BookingWidget({
               </div>
             ) : (
               <>
-                <h4 className="mb-1 text-sm font-semibold text-indigo-900">
+                <h4 className="mb-1 text-sm font-semibold text-primary-900">
                   {selectedSlot.title || selectedSlot.date}
                 </h4>
                 <p className="mb-4 text-xs text-gray-500">
@@ -179,7 +179,7 @@ export default function BookingWidget({
                       onChange={(e) =>
                         setForm((f) => ({ ...f, childName: e.target.value }))
                       }
-                      className="w-full rounded-lg border border-indigo-200 px-3 py-2 text-sm focus:border-indigo-500 focus:outline-none focus:ring-1 focus:ring-indigo-500"
+                      className="w-full rounded-lg border border-primary-200 px-3 py-2 text-sm focus:border-primary-500 focus:outline-none focus:ring-1 focus:ring-primary-500"
                     />
                   </div>
                   <div>
@@ -195,7 +195,7 @@ export default function BookingWidget({
                       onChange={(e) =>
                         setForm((f) => ({ ...f, childAge: e.target.value }))
                       }
-                      className="w-full rounded-lg border border-indigo-200 px-3 py-2 text-sm focus:border-indigo-500 focus:outline-none focus:ring-1 focus:ring-indigo-500"
+                      className="w-full rounded-lg border border-primary-200 px-3 py-2 text-sm focus:border-primary-500 focus:outline-none focus:ring-1 focus:ring-primary-500"
                     />
                   </div>
                   <div>
@@ -208,7 +208,7 @@ export default function BookingWidget({
                       onChange={(e) =>
                         setForm((f) => ({ ...f, notes: e.target.value }))
                       }
-                      className="w-full rounded-lg border border-indigo-200 px-3 py-2 text-sm focus:border-indigo-500 focus:outline-none focus:ring-1 focus:ring-indigo-500"
+                      className="w-full rounded-lg border border-primary-200 px-3 py-2 text-sm focus:border-primary-500 focus:outline-none focus:ring-1 focus:ring-primary-500"
                     />
                   </div>
                   <div className="flex gap-2 pt-1">

@@ -166,12 +166,14 @@ export default function SchedulePage() {
                       </button>
                       <button
                         onClick={() => openEdit(slot)}
+                        aria-label="Редактировать"
                         className="rounded-lg p-2 text-gray-400 transition-colors hover:bg-gray-100 hover:text-gray-600"
                       >
                         <Pencil className="h-4 w-4" />
                       </button>
                       <button
                         onClick={() => handleDelete(slot.id)}
+                        aria-label="Удалить"
                         className="rounded-lg p-2 text-gray-400 transition-colors hover:bg-red-50 hover:text-red-600"
                       >
                         <Trash2 className="h-4 w-4" />
@@ -192,7 +194,7 @@ export default function SchedulePage() {
               <h2 className="text-lg font-semibold text-gray-900">
                 {editingId ? "Редактировать слот" : "Новый слот"}
               </h2>
-              <button onClick={() => setModalOpen(false)} className="text-gray-400 hover:text-gray-600">
+              <button onClick={() => setModalOpen(false)} aria-label="Закрыть" className="text-gray-400 hover:text-gray-600">
                 <X className="h-5 w-5" />
               </button>
             </div>

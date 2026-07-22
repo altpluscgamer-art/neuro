@@ -162,6 +162,22 @@ export default function Footer() {
         )}
 
         <div className="mt-10 border-t border-primary-800 pt-6 text-center text-xs text-primary-200">
+          <div className="mb-3 flex items-center justify-center gap-4">
+            <Link
+              href="/privacy"
+              className="text-primary-200 transition-colors hover:text-white"
+              style={touchAction}
+            >
+              Политика конфиденциальности
+            </Link>
+            <Link
+              href="/terms"
+              className="text-primary-200 transition-colors hover:text-white"
+              style={touchAction}
+            >
+              Условия использования
+            </Link>
+          </div>
           <p>&copy; {new Date().getFullYear()} Нейро. Все права защищены.</p>
           <p className="mt-1 text-primary-300">
             Онлайн-платформа для родителей и детских специалистов

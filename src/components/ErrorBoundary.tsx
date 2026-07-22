@@ -58,7 +58,7 @@ export default class ErrorBoundary extends Component<Props, State> {
               this.setState({ hasError: false, error: undefined });
               window.location.reload();
             }}
-            className="rounded-xl bg-indigo-600 px-6 py-2.5 text-sm font-semibold text-white transition-colors hover:bg-indigo-700"
+            className="rounded-xl bg-primary-600 px-6 py-2.5 text-sm font-semibold text-white transition-colors hover:bg-primary-700"
           >
             Обновить страницу
           </button>

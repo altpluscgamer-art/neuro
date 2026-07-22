@@ -57,7 +57,7 @@ export default function ExternalReviews() {
                   {cfg.label}
                 </span>
                 {r.sourceDate && (
-                  <span className="text-xs text-gray-400">
+                  <span className="text-xs text-gray-500">
                     {new Date(r.sourceDate).toLocaleDateString("ru-RU", {
                       day: "numeric",
                       month: "long",
@@ -68,7 +68,7 @@ export default function ExternalReviews() {
               </div>
 
               <div className="mb-3 flex items-center gap-3">
-                <div className="flex h-9 w-9 items-center justify-center rounded-full bg-indigo-100 text-sm font-semibold text-indigo-700">
+                <div className="flex h-9 w-9 items-center justify-center rounded-full bg-primary-100 text-sm font-semibold text-primary-700">
                   {r.author.charAt(0).toUpperCase()}
                 </div>
                 <span className="text-sm font-semibold text-gray-900">
@@ -98,7 +98,7 @@ export default function ExternalReviews() {
                   href={r.sourceUrl}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="mt-4 inline-flex items-center gap-1 text-xs font-medium text-indigo-600 transition-colors hover:text-indigo-800"
+                  className="mt-4 inline-flex items-center gap-1 text-xs font-medium text-primary-600 transition-colors hover:text-primary-800"
                 >
                   Открыть оригинал
                   <ExternalLink className="h-3 w-3" />
@@ -113,7 +113,7 @@ export default function ExternalReviews() {
         <div className="mt-8 text-center">
           <button
             onClick={() => setShowAll(true)}
-            className="inline-flex items-center gap-2 rounded-xl border border-indigo-200 bg-white px-6 py-2.5 text-sm font-semibold text-indigo-600 transition-colors hover:bg-indigo-50"
+            className="inline-flex items-center gap-2 rounded-xl border border-primary-200 bg-white px-6 py-2.5 text-sm font-semibold text-primary-600 transition-colors hover:bg-primary-50"
           >
             Показать все
             <ExternalLink className="h-4 w-4" />

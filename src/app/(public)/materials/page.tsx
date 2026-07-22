@@ -48,10 +48,10 @@ export default async function MaterialsPage({
     .filter(Boolean) as string[];
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-indigo-50/40 to-white">
+    <div className="min-h-screen bg-gradient-to-b from-primary-50/40 to-white">
       <div className="mx-auto max-w-6xl px-4 py-16 sm:px-6 lg:px-8">
         <div className="mb-12 text-center">
-          <div className="mb-4 inline-flex items-center gap-2 rounded-full bg-indigo-100 px-4 py-1.5 text-sm font-medium text-indigo-700">
+          <div className="mb-4 inline-flex items-center gap-2 rounded-full bg-primary-100 px-4 py-1.5 text-sm font-medium text-primary-700">
             <BookOpen className="h-4 w-4" />
             Библиотека знаний
           </div>
@@ -72,8 +72,8 @@ export default async function MaterialsPage({
             href={`/materials${source ? `?source=${encodeURIComponent(source)}` : ""}`}
             className={`rounded-full px-4 py-1.5 text-sm font-medium transition-colors ${
               !category
-                ? "bg-indigo-600 text-white shadow-sm"
-                : "bg-white text-gray-600 ring-1 ring-gray-200 hover:bg-indigo-50 hover:text-indigo-700"
+                ? "bg-primary-600 text-white shadow-sm"
+                : "bg-white text-gray-600 ring-1 ring-gray-200 hover:bg-primary-50 hover:text-primary-700"
             }`}
           >
             Все
@@ -84,8 +84,8 @@ export default async function MaterialsPage({
               href={`/materials?category=${encodeURIComponent(cat)}${source ? `&source=${encodeURIComponent(source)}` : ""}`}
               className={`rounded-full px-4 py-1.5 text-sm font-medium transition-colors ${
                 category === cat
-                  ? "bg-indigo-600 text-white shadow-sm"
-                  : "bg-white text-gray-600 ring-1 ring-gray-200 hover:bg-indigo-50 hover:text-indigo-700"
+                  ? "bg-primary-600 text-white shadow-sm"
+                  : "bg-white text-gray-600 ring-1 ring-gray-200 hover:bg-primary-50 hover:text-primary-700"
               }`}
             >
               {cat}
@@ -131,7 +131,7 @@ export default async function MaterialsPage({
             <p className="text-lg font-medium text-gray-500">
               Статьи не найдены
             </p>
-            <p className="mt-1 text-sm text-gray-400">
+            <p className="mt-1 text-sm text-gray-500">
               Попробуйте выбрать другую категорию
             </p>
           </div>
@@ -142,11 +142,11 @@ export default async function MaterialsPage({
 
               const cardContent = (
                 <>
-                  <div className="flex h-48 items-center justify-center bg-gradient-to-br from-indigo-100 to-violet-100">
+                  <div className="flex h-48 items-center justify-center bg-gradient-to-br from-primary-100 to-violet-100">
                     {isTelegram ? (
                       <Send className="h-12 w-12 text-sky-400" />
                     ) : (
-                      <BookOpen className="h-12 w-12 text-indigo-300" />
+                      <BookOpen className="h-12 w-12 text-primary-300" />
                     )}
                   </div>
                   <div className="flex flex-1 flex-col p-5">
@@ -163,7 +163,7 @@ export default async function MaterialsPage({
                           {article.category}
                         </span>
                       )}
-                      <span className="text-xs text-gray-400">
+                      <span className="text-xs text-gray-500">
                         {new Date(article.createdAt).toLocaleDateString("ru-RU", {
                           day: "numeric",
                           month: "long",
@@ -171,13 +171,13 @@ export default async function MaterialsPage({
                         })}
                       </span>
                     </div>
-                    <h2 className={`mb-2 text-lg font-semibold text-gray-900 transition-colors ${isTelegram ? "group-hover:text-sky-600" : "group-hover:text-indigo-600"}`}>
+                    <h2 className={`mb-2 text-lg font-semibold text-gray-900 transition-colors ${isTelegram ? "group-hover:text-sky-600" : "group-hover:text-primary-600"}`}>
                       {article.title}
                     </h2>
                     <p className="flex-1 text-sm leading-relaxed text-gray-600 line-clamp-3">
                       {article.excerpt}
                     </p>
-                    <span className={`mt-4 text-sm font-medium ${isTelegram ? "text-sky-600 group-hover:text-sky-700" : "text-indigo-600 group-hover:text-indigo-700"}`}>
+                    <span className={`mt-4 text-sm font-medium ${isTelegram ? "text-sky-600 group-hover:text-sky-700" : "text-primary-600 group-hover:text-primary-700"}`}>
                       {isTelegram ? "Открыть в Telegram →" : "Читать далее →"}
                     </span>
                   </div>
@@ -211,7 +211,7 @@ export default async function MaterialsPage({
           </div>
         )}
 
-        <div className="mt-16 rounded-2xl border border-gray-100 bg-gradient-to-br from-violet-50 to-indigo-50 p-8 text-center">
+        <div className="mt-16 rounded-2xl border border-gray-100 bg-gradient-to-br from-violet-50 to-primary-50 p-8 text-center">
           <Video className="mx-auto mb-4 h-10 w-10 text-violet-600" />
           <h2 className="mb-2 text-xl font-bold text-gray-900">
             Также смотрите наши онлайн-курсы

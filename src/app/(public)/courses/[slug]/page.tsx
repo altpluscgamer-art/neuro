@@ -1,5 +1,6 @@
 import { notFound } from "next/navigation";
 import Link from "next/link";
+import Image from "next/image";
 import prisma from "@/lib/prisma";
 import SEOHead from "@/components/SEOHead";
 import Breadcrumbs from "@/components/Breadcrumbs";
@@ -46,7 +47,7 @@ export default async function CoursePage({
   if (!course || !course.isPublished) notFound();
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-indigo-50/40 to-white">
+    <div className="min-h-screen bg-gradient-to-b from-primary-50/40 to-white">
       <SEOHead
         type="course"
         title={course.title}
@@ -59,20 +60,22 @@ export default async function CoursePage({
         <Breadcrumbs items={[{ label: "Главная", href: "/" }, { label: "Курсы", href: "/courses" }, { label: course.title }]} />
         <Link
           href="/courses"
-          className="mb-8 inline-flex items-center gap-2 text-sm font-medium text-indigo-600 hover:text-indigo-700 transition-colors"
+          className="mb-8 inline-flex items-center gap-2 text-sm font-medium text-primary-600 hover:text-primary-700 transition-colors"
         >
           <ArrowLeft className="h-4 w-4" />
           Все курсы
         </Link>
 
         <div className="overflow-hidden rounded-2xl border border-gray-100 bg-white shadow-sm">
-          <div className="relative flex h-72 items-center justify-center bg-gradient-to-br from-violet-100 to-indigo-100">
+          <div className="relative flex h-72 items-center justify-center bg-gradient-to-br from-violet-100 to-primary-100">
             <Play className="h-20 w-20 text-violet-300" />
             {course.image && (
-              <img
+              <Image
                 src={course.image}
                 alt={course.title}
-                className="absolute inset-0 h-full w-full object-cover"
+                width={400}
+                height={300}
+                className="absolute inset-0 h-full w-full rounded-xl object-cover"
               />
             )}
           </div>
@@ -83,7 +86,7 @@ export default async function CoursePage({
             </h1>
 
             <div className="mb-6 flex flex-wrap items-center gap-4 text-sm text-gray-500">
-              <span className="inline-flex items-center gap-1.5 rounded-full bg-indigo-50 px-3 py-1 font-medium text-indigo-700">
+              <span className="inline-flex items-center gap-1.5 rounded-full bg-primary-50 px-3 py-1 font-medium text-primary-700">
                 <Clock className="h-4 w-4" />
                 {course.lessons}{" "}
                 {course.lessons === 1
@@ -92,14 +95,14 @@ export default async function CoursePage({
                     ? "урока"
                     : "уроков"}
               </span>
-              <span className="text-2xl font-bold text-indigo-600">
+              <span className="text-2xl font-bold text-primary-600">
                 {course.price > 0
                   ? `${course.price.toLocaleString("ru-RU")} ₽`
                   : "Бесплатно"}
               </span>
             </div>
 
-            <div className="prose prose-lg max-w-none prose-headings:text-gray-900 prose-p:text-gray-700 prose-a:text-indigo-600 prose-strong:text-gray-900">
+            <div className="prose prose-lg max-w-none prose-headings:text-gray-900 prose-p:text-gray-700 prose-a:text-primary-600 prose-strong:text-gray-900">
               <div dangerouslySetInnerHTML={{ __html: formatContent(course.description) }} />
             </div>
 
@@ -117,10 +120,10 @@ export default async function CoursePage({
             )}
 
             <div className="mt-8 flex flex-col gap-3 sm:flex-row">
-              <button className="inline-flex items-center justify-center gap-2 rounded-xl bg-indigo-600 px-8 py-3.5 text-base font-semibold text-white shadow-sm transition-colors hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2">
+              <Link href="/booking" className="inline-flex items-center justify-center gap-2 rounded-xl bg-primary-600 px-8 py-3.5 text-base font-semibold text-white shadow-sm transition-colors hover:bg-primary-700 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2">
                 <BookOpen className="h-5 w-5" />
                 Записаться на курс
-              </button>
+              </Link>
             </div>
           </div>
         </div>

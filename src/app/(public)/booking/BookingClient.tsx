@@ -45,7 +45,7 @@ const typeLabels: Record<string, string> = {
 };
 
 const typeColors: Record<string, string> = {
-  consultation: "bg-indigo-50 text-indigo-700 ring-indigo-200",
+  consultation: "bg-primary-50 text-primary-700 ring-primary-200",
   diagnostics: "bg-teal-50 text-teal-700 ring-teal-200",
   correction: "bg-violet-50 text-violet-700 ring-violet-200",
   group: "bg-amber-50 text-amber-700 ring-amber-200",
@@ -174,16 +174,13 @@ export default function BookingClient() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-indigo-50/40 to-white">
+    <div className="min-h-screen bg-gradient-to-b from-primary-50/40 to-white">
       <div className="mx-auto max-w-4xl px-4 py-8 sm:px-6 sm:py-16 lg:px-8">
         <div className="mb-12 text-center">
           <div className="mb-4 inline-flex items-center gap-2 rounded-full bg-teal-100 px-4 py-1.5 text-sm font-medium text-teal-700">
             <Calendar className="h-4 w-4" />
             Запись на приём
           </div>
-          <h1 className="text-3xl font-bold tracking-tight text-gray-900 sm:text-4xl">
-            Расписание
-          </h1>
           <p className="mt-3 text-lg text-gray-600">
             Выберите удобное время для консультации или занятия
           </p>
@@ -191,7 +188,7 @@ export default function BookingClient() {
 
         {loading && (
           <div className="flex justify-center py-20">
-            <div className="h-8 w-8 animate-spin rounded-full border-4 border-indigo-200 border-t-indigo-600" />
+            <div className="h-8 w-8 animate-spin rounded-full border-4 border-primary-200 border-t-primary-600" />
           </div>
         )}
 
@@ -205,7 +202,7 @@ export default function BookingClient() {
           <div className="flex flex-col items-center justify-center py-20 text-center">
             <Calendar className="mb-4 h-12 w-12 text-gray-300" />
             <p className="text-lg font-medium text-gray-500">Нет доступных слотов</p>
-            <p className="mt-1 text-sm text-gray-400">Расписание будет обновлено позже</p>
+            <p className="mt-1 text-sm text-gray-500">Расписание будет обновлено позже</p>
           </div>
         )}
 
@@ -226,7 +223,7 @@ export default function BookingClient() {
                       >
                         <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:gap-4">
                           <span className="inline-flex items-center gap-1.5 text-sm font-semibold text-gray-900">
-                            <Clock className="h-4 w-4 text-indigo-500" />
+                            <Clock className="h-4 w-4 text-primary-500" />
                             {slot.timeStart} – {slot.timeEnd}
                           </span>
                           <span className="text-sm font-medium text-gray-700">
@@ -248,7 +245,7 @@ export default function BookingClient() {
                           </span>
                           <button
                             onClick={() => openModal(slot)}
-                            className="rounded-lg bg-indigo-600 px-4 py-2.5 text-sm font-semibold text-white transition-colors hover:bg-indigo-700 active:bg-indigo-800"
+                            className="rounded-lg bg-primary-600 px-4 py-2.5 text-sm font-semibold text-white transition-colors hover:bg-primary-700 active:bg-primary-800"
                             style={{ touchAction: "manipulation", minHeight: "44px" }}
                           >
                             Записаться
@@ -288,7 +285,7 @@ export default function BookingClient() {
                 </p>
                 <button
                   onClick={closeModal}
-                  className="mt-6 rounded-xl bg-indigo-600 px-6 py-2.5 text-sm font-semibold text-white transition-colors hover:bg-indigo-700"
+                  className="mt-6 rounded-xl bg-primary-600 px-6 py-2.5 text-sm font-semibold text-white transition-colors hover:bg-primary-700"
                   style={{ touchAction: "manipulation", minHeight: "44px" }}
                 >
                   Закрыть
@@ -300,18 +297,19 @@ export default function BookingClient() {
                   <h3 className="text-xl font-bold text-gray-900">Запись на приём</h3>
                   <button
                     onClick={closeModal}
-                    className="rounded-lg p-2 text-gray-400 hover:bg-gray-100 hover:text-gray-600"
+                    aria-label="Закрыть"
+                    className="rounded-lg p-2 text-gray-500 hover:bg-gray-100 hover:text-gray-600"
                     style={{ touchAction: "manipulation", minHeight: "44px", minWidth: "44px" }}
                   >
                     <X className="h-5 w-5" />
                   </button>
                 </div>
 
-                <div className="mb-6 rounded-xl bg-indigo-50 p-4">
-                  <p className="text-sm font-semibold text-indigo-900">
+                <div className="mb-6 rounded-xl bg-primary-50 p-4">
+                  <p className="text-sm font-semibold text-primary-900">
                     {selected.title}
                   </p>
-                  <p className="mt-1 text-sm text-indigo-700">
+                  <p className="mt-1 text-sm text-primary-700">
                     {capitalize(formatDate(selected.date))}, {selected.timeStart}–
                     {selected.timeEnd}
                   </p>
@@ -325,25 +323,27 @@ export default function BookingClient() {
 
                 <form onSubmit={handleSubmit} className="flex flex-col gap-4">
                   <div>
-                    <label className="mb-1 block text-sm font-medium text-gray-700">
+                    <label htmlFor="childName" className="mb-1 block text-sm font-medium text-gray-700">
                       Имя ребёнка *
                     </label>
                     <input
+                      id="childName"
                       type="text"
                       value={form.childName}
                       onChange={(e) =>
                         setForm((f) => ({ ...f, childName: e.target.value }))
                       }
-                      className="w-full rounded-lg border border-gray-200 px-3 py-2.5 text-sm text-gray-900 outline-none transition-colors focus:border-indigo-400 focus:ring-2 focus:ring-indigo-100"
+                      className="w-full rounded-lg border border-gray-200 px-3 py-2.5 text-sm text-gray-900 outline-none transition-colors focus:border-primary-400 focus:ring-2 focus:ring-primary-100"
                       placeholder="Имя ребёнка"
                       style={{ fontSize: "16px" }}
                     />
                   </div>
                   <div>
-                    <label className="mb-1 block text-sm font-medium text-gray-700">
+                    <label htmlFor="childAge" className="mb-1 block text-sm font-medium text-gray-700">
                       Возраст ребёнка *
                     </label>
                     <input
+                      id="childAge"
                       type="number"
                       min={1}
                       max={18}
@@ -351,7 +351,7 @@ export default function BookingClient() {
                       onChange={(e) =>
                         setForm((f) => ({ ...f, childAge: e.target.value }))
                       }
-                      className="w-full rounded-lg border border-gray-200 px-3 py-2.5 text-sm text-gray-900 outline-none transition-colors focus:border-indigo-400 focus:ring-2 focus:ring-indigo-100"
+                      className="w-full rounded-lg border border-gray-200 px-3 py-2.5 text-sm text-gray-900 outline-none transition-colors focus:border-primary-400 focus:ring-2 focus:ring-primary-100"
                       placeholder="Возраст"
                       style={{ fontSize: "16px" }}
                     />
@@ -362,46 +362,49 @@ export default function BookingClient() {
                     </p>
                     <div className="space-y-3">
                       <div>
-                        <label className="mb-1 block text-sm font-medium text-gray-700">
+                        <label htmlFor="parentName" className="mb-1 block text-sm font-medium text-gray-700">
                           Ваше имя *
                         </label>
                         <input
+                          id="parentName"
                           type="text"
                           value={form.parentName}
                           onChange={(e) =>
                             setForm((f) => ({ ...f, parentName: e.target.value }))
                           }
-                          className="w-full rounded-lg border border-gray-200 px-3 py-2.5 text-sm text-gray-900 outline-none transition-colors focus:border-indigo-400 focus:ring-2 focus:ring-indigo-100"
+                          className="w-full rounded-lg border border-gray-200 px-3 py-2.5 text-sm text-gray-900 outline-none transition-colors focus:border-primary-400 focus:ring-2 focus:ring-primary-100"
                           placeholder="Ваше имя"
                           style={{ fontSize: "16px" }}
                         />
                       </div>
                       <div>
-                        <label className="mb-1 block text-sm font-medium text-gray-700">
+                        <label htmlFor="parentPhone" className="mb-1 block text-sm font-medium text-gray-700">
                           Телефон *
                         </label>
                         <input
+                          id="parentPhone"
                           type="tel"
                           value={form.parentPhone}
                           onChange={(e) =>
                             setForm((f) => ({ ...f, parentPhone: e.target.value }))
                           }
-                          className="w-full rounded-lg border border-gray-200 px-3 py-2.5 text-sm text-gray-900 outline-none transition-colors focus:border-indigo-400 focus:ring-2 focus:ring-indigo-100"
+                          className="w-full rounded-lg border border-gray-200 px-3 py-2.5 text-sm text-gray-900 outline-none transition-colors focus:border-primary-400 focus:ring-2 focus:ring-primary-100"
                           placeholder="+7 (___) ___-__-__"
                           style={{ fontSize: "16px" }}
                         />
                       </div>
                       <div>
-                        <label className="mb-1 block text-sm font-medium text-gray-700">
+                        <label htmlFor="parentEmail" className="mb-1 block text-sm font-medium text-gray-700">
                           Email *
                         </label>
                         <input
+                          id="parentEmail"
                           type="email"
                           value={form.parentEmail}
                           onChange={(e) =>
                             setForm((f) => ({ ...f, parentEmail: e.target.value }))
                           }
-                          className="w-full rounded-lg border border-gray-200 px-3 py-2.5 text-sm text-gray-900 outline-none transition-colors focus:border-indigo-400 focus:ring-2 focus:ring-indigo-100"
+                          className="w-full rounded-lg border border-gray-200 px-3 py-2.5 text-sm text-gray-900 outline-none transition-colors focus:border-primary-400 focus:ring-2 focus:ring-primary-100"
                           placeholder="email@example.com"
                           style={{ fontSize: "16px" }}
                         />
@@ -409,16 +412,17 @@ export default function BookingClient() {
                     </div>
                   </div>
                   <div>
-                    <label className="mb-1 block text-sm font-medium text-gray-700">
+                    <label htmlFor="notes" className="mb-1 block text-sm font-medium text-gray-700">
                       Примечания
                     </label>
                     <textarea
+                      id="notes"
                       value={form.notes}
                       onChange={(e) =>
                         setForm((f) => ({ ...f, notes: e.target.value }))
                       }
                       rows={3}
-                      className="w-full rounded-lg border border-gray-200 px-3 py-2.5 text-sm text-gray-900 outline-none transition-colors focus:border-indigo-400 focus:ring-2 focus:ring-indigo-100"
+                      className="w-full rounded-lg border border-gray-200 px-3 py-2.5 text-sm text-gray-900 outline-none transition-colors focus:border-primary-400 focus:ring-2 focus:ring-primary-100"
                       placeholder="Дополнительная информация"
                       style={{ fontSize: "16px" }}
                     />
@@ -426,7 +430,7 @@ export default function BookingClient() {
                   <button
                     type="submit"
                     disabled={submitting}
-                    className="mt-2 inline-flex items-center justify-center gap-2 rounded-xl bg-indigo-600 px-6 py-3 text-sm font-semibold text-white transition-colors hover:bg-indigo-700 disabled:opacity-50"
+                    className="mt-2 inline-flex items-center justify-center gap-2 rounded-xl bg-primary-600 px-6 py-3 text-sm font-semibold text-white transition-colors hover:bg-primary-700 disabled:opacity-50"
                     style={{ touchAction: "manipulation", minHeight: "44px" }}
                   >
                     {submitting ? (

@@ -8,9 +8,9 @@ type Size = "sm" | "md" | "lg";
 
 const variantStyles: Record<Variant, string> = {
   primary:
-    "bg-indigo-600 text-white hover:bg-indigo-700 focus-visible:ring-indigo-500 shadow-sm",
+    "bg-primary-600 text-white hover:bg-primary-700 focus-visible:ring-primary-500 shadow-sm",
   secondary:
-    "border border-indigo-300 bg-white text-indigo-700 hover:bg-indigo-50 focus-visible:ring-indigo-500",
+    "border border-primary-300 bg-white text-primary-700 hover:bg-primary-50 focus-visible:ring-primary-500",
   accent:
     "bg-teal-600 text-white hover:bg-teal-700 focus-visible:ring-teal-500 shadow-sm",
 };

@@ -178,7 +178,7 @@ export default function PrivacyPage() {
             ))}
           </div>
 
-          <p className="mt-12 border-t border-primary-100 pt-6 text-sm text-gray-400">
+          <p className="mt-12 border-t border-primary-100 pt-6 text-sm text-gray-500">
             Настоящая политика может быть обновлена. Дата последнего обновления
             указывается на странице.
           </p>

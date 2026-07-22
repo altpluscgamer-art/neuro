@@ -52,7 +52,7 @@ export const metadata: Metadata = {
       "Онлайн-платформа для родителей и детских нейропсихологов. Диагностика, консультации, курсы и материалы для развития.",
   },
   other: {
-    "theme-color": "#6d28d9",
+    "theme-color": "#6A7450",
   },
 };
 
@@ -67,7 +67,7 @@ export default function RootLayout({
       className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
     >
       <head>
-        <meta name="theme-color" content="#6d28d9" />
+        <meta name="theme-color" content="#6A7450" />
         <meta httpEquiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
         <meta httpEquiv="Pragma" content="no-cache" />
       </head>

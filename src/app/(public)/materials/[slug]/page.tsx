@@ -56,7 +56,7 @@ export default async function ArticlePage({
   });
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-indigo-50/40 to-white">
+    <div className="min-h-screen bg-gradient-to-b from-primary-50/40 to-white">
       <SEOHead
         type="article"
         title={article.title}
@@ -69,7 +69,7 @@ export default async function ArticlePage({
         <Breadcrumbs items={[{ label: "Главная", href: "/" }, { label: "Материалы", href: "/materials" }, { label: article.title }]} />
         <Link
           href="/materials"
-          className="mb-8 inline-flex items-center gap-2 text-sm font-medium text-indigo-600 hover:text-indigo-700 transition-colors"
+          className="mb-8 inline-flex items-center gap-2 text-sm font-medium text-primary-600 hover:text-primary-700 transition-colors"
         >
           <ArrowLeft className="h-4 w-4" />
           Все материалы
@@ -85,7 +85,7 @@ export default async function ArticlePage({
                     {article.category}
                   </span>
                 )}
-                <span className="inline-flex items-center gap-1.5 text-sm text-gray-400">
+                <span className="inline-flex items-center gap-1.5 text-sm text-gray-500">
                   <Calendar className="h-3.5 w-3.5" />
                   {new Date(article.createdAt).toLocaleDateString("ru-RU", {
                     day: "numeric",
@@ -99,7 +99,7 @@ export default async function ArticlePage({
               </h1>
             </header>
 
-            <div className="prose prose-lg max-w-none prose-headings:text-gray-900 prose-p:text-gray-700 prose-a:text-indigo-600 prose-strong:text-gray-900">
+            <div className="prose prose-lg max-w-none prose-headings:text-gray-900 prose-p:text-gray-700 prose-a:text-primary-600 prose-strong:text-gray-900">
               <div dangerouslySetInnerHTML={{ __html: formatContent(article.content) }} />
             </div>
           </article>
@@ -108,7 +108,7 @@ export default async function ArticlePage({
             <aside className="mt-12 lg:mt-0">
               <div className="rounded-2xl border border-gray-100 bg-white p-6 shadow-sm">
                 <h3 className="mb-4 flex items-center gap-2 text-lg font-semibold text-gray-900">
-                  <BookOpen className="h-5 w-5 text-indigo-600" />
+                  <BookOpen className="h-5 w-5 text-primary-600" />
                   Похожие материалы
                 </h3>
                 <div className="flex flex-col gap-4">
@@ -116,9 +116,9 @@ export default async function ArticlePage({
                     <Link
                       key={r.id}
                       href={`/materials/${r.slug}`}
-                      className="group rounded-xl p-3 transition-colors hover:bg-indigo-50/60"
+                      className="group rounded-xl p-3 transition-colors hover:bg-primary-50/60"
                     >
-                      <h4 className="text-sm font-semibold text-gray-900 group-hover:text-indigo-600 transition-colors">
+                      <h4 className="text-sm font-semibold text-gray-900 group-hover:text-primary-600 transition-colors">
                         {r.title}
                       </h4>
                       <p className="mt-1 text-xs text-gray-500 line-clamp-2">

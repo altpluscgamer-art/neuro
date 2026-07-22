@@ -243,6 +243,7 @@ export default function SettingsPage() {
                     <button
                       type="button"
                       onClick={() => toggleVisibility(field.key)}
+                      aria-label={visible ? "Скрыть" : "Показать"}
                       className="absolute right-2 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600"
                     >
                       {visible ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}

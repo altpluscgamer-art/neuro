@@ -10,14 +10,14 @@ export const metadata = {
 
 export default function ScreeningPage() {
   return (
-    <div className="min-h-screen bg-gradient-to-b from-indigo-50 via-white to-white">
+    <div className="min-h-screen bg-gradient-to-b from-primary-50 via-white to-white">
       <div className="mx-auto max-w-2xl px-4 py-8 sm:py-12">
-        <div className="rounded-3xl border border-gray-200 bg-white p-6 shadow-lg shadow-indigo-100/50 sm:p-8">
+        <div className="rounded-3xl border border-gray-200 bg-white p-6 shadow-lg shadow-primary-100/50 sm:p-8">
           <Suspense
             fallback={
               <div className="flex flex-col items-center text-center">
-                <div className="mb-6 flex h-20 w-20 items-center justify-center rounded-2xl bg-indigo-100">
-                  <Brain className="h-10 w-10 text-indigo-600" />
+                <div className="mb-6 flex h-20 w-20 items-center justify-center rounded-2xl bg-primary-100">
+                  <Brain className="h-10 w-10 text-primary-600" />
                 </div>
                 <h1 className="mb-4 text-2xl font-bold text-gray-900 sm:text-3xl">
                   Скрининг развития ребёнка
@@ -27,7 +27,7 @@ export default function ScreeningPage() {
                   рекомендации по развитию ребёнка.
                 </p>
                 <div className="mb-6 flex flex-wrap items-center justify-center gap-3">
-                  <span className="inline-flex items-center gap-1.5 rounded-full bg-indigo-50 px-3 py-1.5 text-sm font-medium text-indigo-700">
+                  <span className="inline-flex items-center gap-1.5 rounded-full bg-primary-50 px-3 py-1.5 text-sm font-medium text-primary-700">
                     <Heart className="h-3.5 w-3.5" />
                     5–7 минут
                   </span>
@@ -44,7 +44,7 @@ export default function ScreeningPage() {
                   Загрузка анкеты…
                 </p>
                 <div className="flex justify-center">
-                  <div className="h-8 w-8 animate-spin rounded-full border-4 border-indigo-200 border-t-indigo-600" />
+                  <div className="h-8 w-8 animate-spin rounded-full border-4 border-primary-200 border-t-primary-600" />
                 </div>
               </div>
             }
