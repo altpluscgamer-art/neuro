@@ -61,11 +61,22 @@ const tabs: { key: Tab; label: string }[] = [
 ];
 
 function slugify(text: string) {
+  const translit: Record<string, string> = {
+    а: "a", б: "b", в: "v", г: "g", д: "d", е: "e", ё: "e",
+    ж: "zh", з: "z", и: "i", й: "y", к: "k", л: "l", м: "m",
+    н: "n", о: "o", п: "p", р: "r", с: "s", т: "t", у: "u",
+    ф: "f", х: "h", ц: "ts", ч: "ch", ш: "sh", щ: "sch",
+    ъ: "", ы: "y", ь: "", э: "e", ю: "yu", я: "ya",
+  };
   return text
     .toLowerCase()
-    .replace(/[^a-zа-яё0-9\s-]/g, "")
+    .split("")
+    .map((ch) => translit[ch] ?? ch)
+    .join("")
+    .replace(/[^a-z0-9\s-]/g, "")
     .replace(/[\s_]+/g, "-")
-    .replace(/^-+|-+$/g, "");
+    .replace(/^-+|-+$/g, "")
+    .replace(/-+/g, "-");
 }
 
 export default function ContentPage() {
@@ -81,10 +92,10 @@ export default function ContentPage() {
     title: "", slug: "", description: "", icon: "", order: 0, isActive: true,
   });
   const [articleForm, setArticleForm] = useState<ArticleForm>({
-    title: "", slug: "", excerpt: "", content: "", category: "", isPublished: false,
+    title: "", slug: "", excerpt: "", content: "", category: "", isPublished: true,
   });
   const [courseForm, setCourseForm] = useState<CourseForm>({
-    title: "", slug: "", description: "", excerpt: "", price: 0, lessons: 1, isPublished: false,
+    title: "", slug: "", description: "", excerpt: "", price: 0, lessons: 1, isPublished: true,
   });
   const [testimonialForm, setTestimonialForm] = useState<TestimonialForm>({
     author: "", text: "", rating: 5, order: 0, isActive: true,
@@ -110,8 +121,8 @@ export default function ContentPage() {
   const openAdd = () => {
     setEditingId(null);
     if (activeTab === "services") setServiceForm({ title: "", slug: "", description: "", icon: "", order: 0, isActive: true });
-    else if (activeTab === "articles") setArticleForm({ title: "", slug: "", excerpt: "", content: "", category: "", isPublished: false });
-    else if (activeTab === "courses") setCourseForm({ title: "", slug: "", description: "", excerpt: "", price: 0, lessons: 1, isPublished: false });
+    else if (activeTab === "articles") setArticleForm({ title: "", slug: "", excerpt: "", content: "", category: "", isPublished: true });
+    else if (activeTab === "courses") setCourseForm({ title: "", slug: "", description: "", excerpt: "", price: 0, lessons: 1, isPublished: true });
     else setTestimonialForm({ author: "", text: "", rating: 5, order: 0, isActive: true });
     setModalOpen(true);
   };

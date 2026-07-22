@@ -1,4 +1,5 @@
 import nodemailer from "nodemailer";
+import { getSetting } from "./settings";
 
 interface ScreeningNotificationPayload {
   id: string;
@@ -22,24 +23,15 @@ export async function sendScreeningNotification(
   })();
 
   const summary = [
+    `Новая анкета пройдена`,
     `Родитель: ${result.parentName ?? "не указан"}`,
     `Возраст ребёнка: ${result.childAge}`,
     `Проблемы: ${concernsList.join(", ")}`,
-    `Ссылка: ${process.env.NEXT_PUBLIC_SITE_URL ?? "https://neuro.local"}/admin/screening/${result.id}`,
+    `Телефон: ${result.parentPhone ?? "не указан"}`,
+    `Email: ${result.parentEmail ?? "не указан"}`,
   ].join("\n");
 
-  if (
-    result.messenger === "telegram" ||
-    (result.parentPhone && result.messenger !== "whatsapp")
-  ) {
-    await sendTelegram(summary);
-  }
-
-  if (result.messenger === "whatsapp" && result.parentPhone) {
-    console.log(
-      `[WhatsApp] Placeholder notification for screening ${result.id} to ${result.parentPhone}`
-    );
-  }
+  await sendTelegram(summary);
 
   if (result.parentEmail) {
     await sendEmail(result.parentEmail, result.id, summary);
@@ -47,13 +39,11 @@ export async function sendScreeningNotification(
 }
 
 async function sendTelegram(text: string): Promise<void> {
-  const token = process.env.TELEGRAM_BOT_TOKEN;
-  const chatId = process.env.TELEGRAM_CHAT_ID;
+  const token = await getSetting("telegram_bot_token");
+  const chatId = await getSetting("telegram_chat_id");
 
   if (!token || !chatId) {
-    console.warn(
-      "[Notifications] TELEGRAM_BOT_TOKEN or TELEGRAM_CHAT_ID not set — skipping Telegram notification"
-    );
+    console.warn("[Notifications] Telegram bot token or chat ID not configured — skipping");
     return;
   }
 
@@ -67,9 +57,7 @@ async function sendTelegram(text: string): Promise<void> {
 
     if (!res.ok) {
       const body = await res.text();
-      console.error(
-        `[Notifications] Telegram API error ${res.status}: ${body}`
-      );
+      console.error(`[Notifications] Telegram API error ${res.status}: ${body}`);
     }
   } catch (err) {
     console.error("[Notifications] Telegram send failed:", err);
@@ -81,15 +69,14 @@ async function sendEmail(
   screeningId: string,
   summary: string
 ): Promise<void> {
-  const host = process.env.SMTP_HOST;
-  const port = process.env.SMTP_PORT;
-  const user = process.env.SMTP_USER;
-  const pass = process.env.SMTP_PASS;
+  const host = await getSetting("smtp_host");
+  const port = await getSetting("smtp_port");
+  const user = await getSetting("smtp_user");
+  const pass = await getSetting("smtp_pass");
+  const from = await getSetting("smtp_from");
 
   if (!host || !user || !pass) {
-    console.warn(
-      "[Notifications] SMTP_HOST, SMTP_USER or SMTP_PASS not set — skipping email notification"
-    );
+    console.warn("[Notifications] SMTP not configured — skipping email");
     return;
   }
 
@@ -102,9 +89,9 @@ async function sendEmail(
     });
 
     await transporter.sendMail({
-      from: `"Нейро" <${user}>`,
+      from: `"Нейро" <${from || user}>`,
       to,
-      subject: `Результат скрининга #${screeningId}`,
+      subject: `Результат скрининга — Нейро`,
       text: summary,
       html: `<pre style="font-family:sans-serif;white-space:pre-wrap">${summary}</pre>`,
     });

@@ -3,6 +3,7 @@ import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import prisma from "@/lib/prisma";
 import { generateReport } from "@/lib/screening-logic";
+import { sendScreeningNotification } from "@/lib/notifications";
 import bcrypt from "bcryptjs";
 
 export async function POST(request: Request) {
@@ -67,6 +68,16 @@ export async function POST(request: Request) {
         completed: true,
       },
     });
+
+    sendScreeningNotification({
+      id: result.id,
+      parentName: parentName || null,
+      parentPhone: parentPhone || null,
+      parentEmail: parentEmail || null,
+      messenger: messenger || null,
+      childAge,
+      concerns: JSON.stringify(concerns),
+    }).catch(() => {});
 
     return NextResponse.json({ id: result.id, report, userId });
   } catch (error) {

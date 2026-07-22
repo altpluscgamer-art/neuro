@@ -41,7 +41,7 @@ export async function POST(request: Request) {
 
     const secret = createHmac("sha256", botToken).update("WebhookData").digest("hex");
     const xTelegramBotApiSecretHeader = request.headers.get("x-telegram-bot-api-secret-token");
-    if (xTelegramBotApiSecretHeader && xTelegramBotApiSecretHeader !== secret) {
+    if (!xTelegramBotApiSecretHeader || xTelegramBotApiSecretHeader !== secret) {
       return NextResponse.json({ error: "Invalid secret" }, { status: 403 });
     }
 
@@ -100,9 +100,8 @@ export async function GET() {
     }
 
     const webhookUrl = await getSetting("telegram_webhook_url");
-    if (!webhookUrl) {
-      return NextResponse.json({ error: "Webhook URL not configured" }, { status: 500 });
-    }
+    const baseUrl = process.env.NEXTAUTH_URL || "http://localhost:3000";
+    const fullWebhookUrl = webhookUrl || `${baseUrl}/api/telegram/webhook`;
 
     const secret = createHmac("sha256", botToken).update("WebhookData").digest("hex");
 
@@ -112,7 +111,7 @@ export async function GET() {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          url: webhookUrl,
+          url: fullWebhookUrl,
           secret_token: secret,
           allowed_updates: ["channel_post"],
         }),
