@@ -1,5 +1,6 @@
 import Link from "next/link";
 import prisma from "@/lib/prisma";
+import { getPageContent, getOr } from "@/lib/page-content";
 import {
   Brain,
   Sparkles,
@@ -107,7 +108,7 @@ const problemCategories = [
 ];
 
 export default async function HomePage() {
-  const [services, testimonials]: [ServiceRow[], TestimonialRow[]] =
+  const [services, testimonials, pc]: [ServiceRow[], TestimonialRow[], Record<string, string>] =
     await Promise.all([
       prisma.service.findMany({
         where: { isActive: true },
@@ -118,7 +119,23 @@ export default async function HomePage() {
         orderBy: { order: "asc" },
         take: 6,
       }),
+      getPageContent(),
     ]);
+
+  const heroBadge = getOr(pc, "page_home_badge", "Нейропсихологическая помощь детям");
+  const heroTitle = getOr(pc, "page_home_title", "Помогаем детям развиваться, а родителям — понимать");
+  const heroSubtitle = getOr(pc, "page_home_subtitle", "Научно обоснованные методики для диагностики и развития детей от 1 до 13 лет. Онлайн-консультации, курсы и материалы от квалифицированного нейропсихолога.");
+  const cta1Text = getOr(pc, "page_home_cta1_text", "Пройти анкету");
+  const cta1Link = getOr(pc, "page_home_cta1_link", "/screening");
+  const cta2Text = getOr(pc, "page_home_cta2_text", "Записаться");
+  const cta2Link = getOr(pc, "page_home_cta2_link", "/booking");
+  const servicesTitle = getOr(pc, "page_home_services_title", "Наши услуги");
+  const servicesSubtitle = getOr(pc, "page_home_services_subtitle", "Комплексный подход к развитию и поддержке вашего ребёнка");
+  const problemsTitle = getOr(pc, "page_home_problems_title", "С какими трудностями мы помогаем");
+  const testimonialsTitle = getOr(pc, "page_home_testimonials_title", "Отзывы родителей");
+  const testimonialsSubtitle = getOr(pc, "page_home_testimonials_subtitle", "Истории семей, которым мы помогли");
+  const ctaTitle = getOr(pc, "page_home_cta_title", "Готовы помочь вашему ребёнку?");
+  const ctaSubtitle = getOr(pc, "page_home_cta_subtitle", "Запишитесь на консультацию или пройдите скрининг-анкету, чтобы получить индивидуальные рекомендации по развитию.");
 
   return (
     <>
@@ -128,33 +145,31 @@ export default async function HomePage() {
           <div className="max-w-2xl">
             <div className="mb-6 inline-flex items-center gap-2 rounded-full bg-primary-100 px-4 py-1.5 text-sm font-medium text-primary-700">
               <Brain className="h-4 w-4" />
-              Нейропсихологическая помощь детям
+              {heroBadge}
             </div>
 
             <h1 className="text-4xl font-bold tracking-tight text-primary-950 sm:text-5xl lg:text-6xl">
-              Помогаем детям развиваться, а родителям&nbsp;&mdash; понимать
+              {heroTitle}
             </h1>
 
             <p className="mt-6 text-lg leading-relaxed text-gray-600 sm:text-xl">
-              Научно обоснованные методики для диагностики и развития детей от 1
-              до 13 лет. Помогаем выявить трудности и подобрать эффективный
-              путь развития&nbsp;&mdash; онлайн и очно.
+              {heroSubtitle}
             </p>
 
             <div className="mt-8 flex flex-col gap-4 sm:flex-row">
               <Link
-                href="/screening"
+                href={cta1Link}
                 className="inline-flex items-center justify-center gap-2 rounded-xl bg-primary-600 px-6 py-3.5 text-base font-semibold text-white shadow-lg shadow-primary-600/25 transition-colors hover:bg-primary-700"
               >
                 <Sparkles className="h-5 w-5" />
-                Пройти анкету
+                {cta1Text}
               </Link>
               <Link
-                href="/booking"
+                href={cta2Link}
                 className="inline-flex items-center justify-center gap-2 rounded-xl border-2 border-primary-200 bg-white px-6 py-3.5 text-base font-semibold text-primary-700 transition-colors hover:border-primary-300 hover:bg-primary-50"
               >
                 <Calendar className="h-5 w-5" />
-                Записаться
+                {cta2Text}
               </Link>
             </div>
           </div>
@@ -190,10 +205,10 @@ export default async function HomePage() {
           <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
             <div className="mb-12 text-center">
               <h2 className="text-3xl font-bold tracking-tight text-primary-950 sm:text-4xl">
-                Наши услуги
+                {servicesTitle}
               </h2>
               <p className="mt-4 text-lg text-gray-600">
-                Комплексный подход к развитию и поддержке вашего ребёнка
+                {servicesSubtitle}
               </p>
             </div>
 
@@ -231,7 +246,7 @@ export default async function HomePage() {
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
           <div className="mb-12 text-center">
             <h2 className="text-3xl font-bold tracking-tight text-primary-950 sm:text-4xl">
-              С какими трудностями мы помогаем
+              {problemsTitle}
             </h2>
             <p className="mt-4 text-lg text-gray-600">
               Нейропсихологическая поддержка по ключевым направлениям развития
@@ -273,10 +288,10 @@ export default async function HomePage() {
           <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
             <div className="mb-12 text-center">
               <h2 className="text-3xl font-bold tracking-tight text-primary-950 sm:text-4xl">
-                Отзывы родителей
+                {testimonialsTitle}
               </h2>
               <p className="mt-4 text-lg text-gray-600">
-                Истории семей, которым мы помогли
+                {testimonialsSubtitle}
               </p>
             </div>
 
@@ -378,11 +393,10 @@ export default async function HomePage() {
       <section className="bg-gradient-to-br from-primary-700 to-primary-900 py-20 sm:py-28">
         <div className="mx-auto max-w-4xl px-4 text-center sm:px-6 lg:px-8">
           <h2 className="text-3xl font-bold tracking-tight text-white sm:text-4xl">
-            Готовы помочь вашему ребёнку?
+            {ctaTitle}
           </h2>
           <p className="mt-4 text-lg leading-relaxed text-primary-100">
-            Запишитесь на консультацию или пройдите скрининг-анкету, чтобы
-            получить индивидуальные рекомендации по развитию.
+            {ctaSubtitle}
           </p>
           <div className="mt-8 flex flex-col items-center justify-center gap-4 sm:flex-row">
             <Link

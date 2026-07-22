@@ -1,10 +1,11 @@
 "use client";
 
 import { useEffect, useState, useCallback } from "react";
-import { FileText, Plus, Pencil, Trash2, Eye, EyeOff, X } from "lucide-react";
+import { FileText, Plus, Pencil, Trash2, Eye, EyeOff, X, Home } from "lucide-react";
 import { clsx } from "clsx";
+import PageContentEditor from "./PageContentEditor";
 
-type Tab = "services" | "articles" | "courses" | "testimonials";
+type Tab = "services" | "articles" | "courses" | "testimonials" | "pages";
 
 interface Service {
   id: string;
@@ -56,6 +57,7 @@ const tabs: { key: Tab; label: string }[] = [
   { key: "articles", label: "Статьи" },
   { key: "courses", label: "Курсы" },
   { key: "testimonials", label: "Отзывы" },
+  { key: "pages", label: "Страницы" },
 ];
 
 function slugify(text: string) {
@@ -91,6 +93,7 @@ export default function ContentPage() {
   const apiUrl = (tab: Tab) => `/api/admin/content/${tab}`;
 
   const fetchData = useCallback(async (tab: Tab) => {
+    if (tab === "pages") return;
     const res = await fetch(apiUrl(tab));
     if (!res.ok) return;
     const data = await res.json();
@@ -165,13 +168,15 @@ export default function ContentPage() {
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <h1 className="text-2xl font-bold text-gray-900">Контент</h1>
-        <button
-          onClick={openAdd}
-          className="inline-flex items-center gap-2 rounded-lg bg-violet-600 px-4 py-2 text-sm font-medium text-white hover:bg-violet-700"
-        >
-          <Plus className="h-4 w-4" />
-          Добавить
-        </button>
+        {activeTab !== "pages" && (
+          <button
+            onClick={openAdd}
+            className="inline-flex items-center gap-2 rounded-lg bg-violet-600 px-4 py-2 text-sm font-medium text-white hover:bg-violet-700"
+          >
+            <Plus className="h-4 w-4" />
+            Добавить
+          </button>
+        )}
       </div>
 
       {/* Tabs */}
@@ -190,8 +195,11 @@ export default function ContentPage() {
         ))}
       </div>
 
+      {/* Pages editor */}
+      {activeTab === "pages" && <PageContentEditor />}
+
       {/* Lists */}
-      {currentList.length === 0 ? (
+      {activeTab !== "pages" && (currentList.length === 0 ? (
         <p className="py-8 text-center text-gray-500">Нет записей</p>
       ) : (
         <div className="space-y-2">
@@ -263,7 +271,7 @@ export default function ContentPage() {
               </div>
             ))}
         </div>
-      )}
+      ))}
 
       {/* Modal */}
       {modalOpen && (
