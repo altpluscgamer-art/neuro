@@ -70,13 +70,15 @@ function slugify(text: string) {
   };
   return text
     .toLowerCase()
+    .trim()
     .split("")
     .map((ch) => translit[ch] ?? ch)
     .join("")
     .replace(/[^a-z0-9\s-]/g, "")
+    .trim()
     .replace(/[\s_]+/g, "-")
-    .replace(/^-+|-+$/g, "")
-    .replace(/-+/g, "-");
+    .replace(/-+/g, "-")
+    .replace(/^-+|-+$/g, "");
 }
 
 export default function ContentPage() {
