@@ -245,7 +245,7 @@ export default function BookingClient() {
                           </span>
                           <button
                             onClick={() => openModal(slot)}
-                            className="rounded-lg bg-primary-600 px-4 py-2.5 text-sm font-semibold text-white transition-colors hover:bg-primary-700 active:bg-primary-800"
+                            className="rounded-lg bg-primary-600 px-4 py-2.5 text-sm font-semibold text-white transition-[color,transform] active:scale-[0.97] hover:bg-primary-700 active:bg-primary-800"
                             style={{ touchAction: "manipulation", minHeight: "44px" }}
                           >
                             Записаться
@@ -263,12 +263,12 @@ export default function BookingClient() {
 
       {selected && (
         <div
-          className="fixed inset-0 z-[200] flex items-center justify-center bg-black/40 p-4"
+          className="fixed inset-0 z-[200] flex items-center justify-center bg-black/40 p-4 animate-fade-in"
           onClick={closeModal}
           style={{ touchAction: "manipulation" }}
         >
           <div
-            className="max-h-[90vh] w-full max-w-md overflow-y-auto rounded-2xl bg-white p-6 shadow-xl sm:p-8"
+            className="max-h-[90vh] w-full max-w-md overflow-y-auto rounded-2xl bg-white p-6 shadow-xl sm:p-8 animate-modal-in"
             onClick={(e) => e.stopPropagation()}
           >
             {success ? (
@@ -285,7 +285,7 @@ export default function BookingClient() {
                 </p>
                 <button
                   onClick={closeModal}
-                  className="mt-6 rounded-xl bg-primary-600 px-6 py-2.5 text-sm font-semibold text-white transition-colors hover:bg-primary-700"
+                  className="mt-6 rounded-xl bg-primary-600 px-6 py-2.5 text-sm font-semibold text-white transition-[color,transform] active:scale-[0.97] hover:bg-primary-700"
                   style={{ touchAction: "manipulation", minHeight: "44px" }}
                 >
                   Закрыть
@@ -298,7 +298,7 @@ export default function BookingClient() {
                   <button
                     onClick={closeModal}
                     aria-label="Закрыть"
-                    className="rounded-lg p-2 text-gray-500 hover:bg-gray-100 hover:text-gray-600"
+                    className="rounded-lg p-2 text-gray-500 active:scale-[0.97] hover:bg-gray-100 hover:text-gray-600"
                     style={{ touchAction: "manipulation", minHeight: "44px", minWidth: "44px" }}
                   >
                     <X className="h-5 w-5" />
@@ -430,7 +430,7 @@ export default function BookingClient() {
                   <button
                     type="submit"
                     disabled={submitting}
-                    className="mt-2 inline-flex items-center justify-center gap-2 rounded-xl bg-primary-600 px-6 py-3 text-sm font-semibold text-white transition-colors hover:bg-primary-700 disabled:opacity-50"
+                    className="mt-2 inline-flex items-center justify-center gap-2 rounded-xl bg-primary-600 px-6 py-3 text-sm font-semibold text-white transition-[color,transform] active:scale-[0.97] hover:bg-primary-700 disabled:opacity-50"
                     style={{ touchAction: "manipulation", minHeight: "44px" }}
                   >
                     {submitting ? (

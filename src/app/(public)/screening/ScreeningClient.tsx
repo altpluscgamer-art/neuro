@@ -434,7 +434,7 @@ function ScreeningPageInner() {
       <button
         type="button"
         onClick={() => transitionTo(1)}
-        className="inline-flex items-center gap-2 rounded-xl bg-primary-600 px-8 py-3 text-base font-semibold text-white shadow-md shadow-primary-200 transition-colors hover:bg-primary-700 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2"
+        className="inline-flex items-center gap-2 rounded-xl bg-primary-600 px-8 py-3 text-base font-semibold text-white shadow-md shadow-primary-200 transition-[color,transform] active:scale-[0.97] duration-150 ease-[var(--ease-out-expo)] hover:bg-primary-700 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2"
         style={{ touchAction: "manipulation", minHeight: "48px" }}
       >
         Начать
@@ -461,7 +461,7 @@ function ScreeningPageInner() {
               type="button"
               onClick={() => selectAge(opt.value)}
               className={clsx(
-                "relative rounded-xl border-2 px-4 py-3 text-center text-sm font-medium transition-all",
+                "relative rounded-xl border-2 px-4 py-3 text-center text-sm font-medium transition-[color,border-color,background-color]",
                 selected
                   ? "border-primary-500 bg-primary-50 text-primary-700 shadow-sm"
                   : "border-gray-200 bg-white text-gray-700 hover:border-primary-300 hover:bg-primary-50/50"
@@ -503,7 +503,7 @@ function ScreeningPageInner() {
               type="button"
               onClick={() => toggleItem("concerns", opt.value)}
               className={clsx(
-                "relative flex items-center gap-3 rounded-xl border-2 px-4 py-3 text-left text-sm font-medium transition-all",
+                "relative flex items-center gap-3 rounded-xl border-2 px-4 py-3 text-left text-sm font-medium transition-[color,border-color,background-color]",
                 selected
                   ? "border-amber-400 bg-amber-50 text-amber-800"
                   : "border-gray-200 bg-white text-gray-700 hover:border-amber-300 hover:bg-amber-50/30"
@@ -567,7 +567,7 @@ function ScreeningPageInner() {
                       type="button"
                       onClick={() => setFrequency(concern, opt.value)}
                       className={clsx(
-                        "min-w-[80px] flex-1 rounded-lg border-2 px-3 py-2 text-center text-sm font-medium transition-all",
+                        "min-w-[80px] flex-1 rounded-lg border-2 px-3 py-2 text-center text-sm font-medium transition-[color,border-color,background-color]",
                         freq === opt.value
                           ? "border-primary-500 bg-primary-50 text-primary-700"
                           : "border-gray-200 bg-white text-gray-600 hover:border-primary-300"
@@ -609,7 +609,7 @@ function ScreeningPageInner() {
               type="button"
               onClick={() => toggleItem("strengths", opt.value)}
               className={clsx(
-                "relative flex items-center gap-3 rounded-xl border-2 px-4 py-3 text-left text-sm font-medium transition-all",
+                "relative flex items-center gap-3 rounded-xl border-2 px-4 py-3 text-left text-sm font-medium transition-[color,border-color,background-color]",
                 selected
                   ? "border-emerald-400 bg-emerald-50 text-emerald-800"
                   : "border-gray-200 bg-white text-gray-700 hover:border-emerald-300 hover:bg-emerald-50/30"
@@ -752,7 +752,7 @@ function ScreeningPageInner() {
                   type="button"
                   onClick={() => setValue("messenger", opt.value)}
                   className={clsx(
-                    "flex flex-col items-center gap-2 rounded-xl border-2 px-3 py-4 text-center transition-all",
+                    "flex flex-col items-center gap-2 rounded-xl border-2 px-3 py-4 text-center transition-[color,border-color,background-color]",
                     selected
                       ? "border-primary-500 bg-primary-50 text-primary-700"
                       : "border-gray-200 bg-white text-gray-600 hover:border-primary-300"
@@ -822,7 +822,7 @@ function ScreeningPageInner() {
                     >
                       <div
                         className={clsx(
-                          "h-3 rounded-full transition-all duration-500",
+                          "h-3 rounded-full transition-[width] duration-500",
                           style.bar
                         )}
                         style={{ width: `${style.healthPct}%` }}
@@ -1138,7 +1138,7 @@ function ScreeningPageInner() {
 
           <div
             className={clsx(
-              "transition-all duration-200",
+              "transition-[opacity,transform] duration-200",
               fade
                 ? "opacity-0 translate-y-2"
                 : "opacity-100 translate-y-0"
@@ -1153,7 +1153,7 @@ function ScreeningPageInner() {
                 <button
                   type="button"
                   onClick={handleBack}
-                  className="inline-flex items-center gap-1.5 rounded-lg px-4 py-2 text-sm font-medium text-gray-600 transition-colors hover:bg-gray-100 hover:text-gray-900"
+                  className="inline-flex items-center gap-1.5 rounded-lg px-4 py-2 text-sm font-medium text-gray-600 transition-[color,transform] active:scale-[0.97] hover:bg-gray-100 hover:text-gray-900"
                   style={{ touchAction: "manipulation", minHeight: "44px" }}
                 >
                   <ChevronLeft className="h-4 w-4" />
@@ -1168,7 +1168,7 @@ function ScreeningPageInner() {
                 onClick={handleNext}
                 disabled={submitting}
                 className={clsx(
-                  "inline-flex items-center gap-1.5 rounded-xl px-6 py-2.5 text-sm font-semibold transition-colors focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2",
+                  "inline-flex items-center gap-1.5 rounded-xl px-6 py-2.5 text-sm font-semibold transition-[color,transform] active:scale-[0.97] duration-150 ease-[var(--ease-out-expo)] focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2",
                   submitting
                     ? "cursor-not-allowed bg-primary-300 text-white"
                     : "bg-primary-600 text-white hover:bg-primary-700"

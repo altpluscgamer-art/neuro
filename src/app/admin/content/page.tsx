@@ -275,8 +275,8 @@ export default function ContentPage() {
 
       {/* Modal */}
       {modalOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40">
-          <div className="w-full max-w-lg rounded-xl bg-white p-6 shadow-xl max-h-[90vh] overflow-y-auto">
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 animate-fade-in">
+          <div className="w-full max-w-lg rounded-xl bg-white p-6 shadow-xl max-h-[90vh] overflow-y-auto animate-modal-in">
             <div className="mb-4 flex items-center justify-between">
               <h2 className="text-lg font-semibold text-gray-900">
                 {editingId ? "Редактировать" : "Создать"}{" "}
@@ -412,7 +412,7 @@ export default function ContentPage() {
                 <button type="button" onClick={() => setModalOpen(false)} className="rounded-lg border border-gray-300 px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50">
                   Отмена
                 </button>
-                <button type="submit" className="rounded-lg bg-violet-600 px-4 py-2 text-sm font-medium text-white hover:bg-violet-700">
+                <button type="submit" className="rounded-lg bg-violet-600 px-4 py-2 text-sm font-medium text-white active:scale-[0.97] hover:bg-violet-700">
                   {editingId ? "Сохранить" : "Создать"}
                 </button>
               </div>

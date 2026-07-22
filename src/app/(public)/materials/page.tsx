@@ -140,7 +140,7 @@ export default async function MaterialsPage({
           </div>
         ) : (
           <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-            {articles.map((article) => {
+            {articles.map((article, i) => {
               const isTelegram = article.source === "telegram";
 
               const cardContent = (
@@ -194,7 +194,8 @@ export default async function MaterialsPage({
                     href={article.externalUrl}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="group flex flex-col overflow-hidden rounded-2xl border border-gray-100 bg-white shadow-sm transition-all hover:shadow-md hover:-translate-y-0.5"
+                    className="group flex flex-col overflow-hidden rounded-2xl border border-gray-100 bg-white shadow-sm transition-[transform,box-shadow] hover:shadow-md hover:-translate-y-0.5 animate-fade-up opacity-0"
+                    style={{ animationDelay: `${i * 50}ms` }}
                   >
                     {cardContent}
                   </a>
@@ -205,7 +206,8 @@ export default async function MaterialsPage({
                 <Link
                   key={article.id}
                   href={`/materials/${article.slug}`}
-                  className="group flex flex-col overflow-hidden rounded-2xl border border-gray-100 bg-white shadow-sm transition-all hover:shadow-md hover:-translate-y-0.5"
+                  className="group flex flex-col overflow-hidden rounded-2xl border border-gray-100 bg-white shadow-sm transition-[transform,box-shadow] hover:shadow-md hover:-translate-y-0.5 animate-fade-up opacity-0"
+                  style={{ animationDelay: `${i * 50}ms` }}
                 >
                   {cardContent}
                 </Link>

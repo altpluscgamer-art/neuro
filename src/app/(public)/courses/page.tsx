@@ -41,11 +41,12 @@ export default async function CoursesPage() {
           </div>
         ) : (
           <div className="grid gap-8 sm:grid-cols-2 lg:grid-cols-3">
-            {courses.map((course) => (
+            {courses.map((course, i) => (
               <Link
                 key={course.id}
                 href={`/courses/${course.slug}`}
-                className="group flex flex-col overflow-hidden rounded-2xl border border-gray-100 bg-white shadow-sm transition-all hover:shadow-md hover:-translate-y-0.5"
+                className="group flex flex-col overflow-hidden rounded-2xl border border-gray-100 bg-white shadow-sm transition-[transform,box-shadow] hover:shadow-md hover:-translate-y-0.5 animate-fade-up opacity-0"
+                style={{ animationDelay: `${i * 50}ms` }}
               >
                 <div className="relative flex h-52 items-center justify-center bg-gradient-to-br from-violet-100 to-primary-100">
                   <Play className="h-14 w-14 text-violet-300 transition-colors group-hover:text-violet-400" />

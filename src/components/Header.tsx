@@ -70,7 +70,7 @@ export default function Header() {
           })}
           <Link
             href={ctaLink.href}
-            className="ml-2 rounded-lg bg-accent-500 px-4 py-2 text-sm font-semibold text-white transition-colors hover:bg-accent-600"
+            className="ml-2 rounded-lg bg-accent-500 px-4 py-2 text-sm font-semibold text-white transition-[color,transform] active:scale-[0.97] hover:bg-accent-600"
             style={touchAction}
           >
             {ctaLink.label}
@@ -142,7 +142,7 @@ export default function Header() {
             })}
             <Link
               href={ctaLink.href}
-              className="block rounded-lg bg-accent-500 px-3 py-3 text-center text-base font-semibold text-white transition-colors hover:bg-accent-600"
+              className="block rounded-lg bg-accent-500 px-3 py-3 text-center text-base font-semibold text-white transition-[color,transform] active:scale-[0.97] hover:bg-accent-600"
               onClick={() => setMobileOpen(false)}
               style={{ ...touchAction, minHeight: "44px" }}
             >

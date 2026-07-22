@@ -117,7 +117,7 @@ export default async function AdminDashboard() {
                 <div key={s.id} className="flex flex-1 flex-col items-center gap-1">
                   <div className="flex w-full items-end justify-center" style={{ height: "90px" }}>
                     <div
-                      className="w-full max-w-[40px] rounded-t bg-violet-500 transition-all"
+                      className="w-full max-w-[40px] rounded-t bg-violet-500 transition-[height]"
                       style={{ height: `${(s.visits / maxWeekVisits) * 100}%`, minHeight: "4px" }}
                       title={`${s.visits} посещений`}
                     />

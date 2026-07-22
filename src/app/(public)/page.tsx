@@ -159,14 +159,14 @@ export default async function HomePage() {
             <div className="mt-8 flex flex-col gap-4 sm:flex-row">
               <Link
                 href={cta1Link}
-                className="inline-flex items-center justify-center gap-2 rounded-xl bg-primary-600 px-6 py-3.5 text-base font-semibold text-white shadow-lg shadow-primary-600/25 transition-colors hover:bg-primary-700"
+                className="inline-flex items-center justify-center gap-2 rounded-xl bg-primary-600 px-6 py-3.5 text-base font-semibold text-white shadow-lg shadow-primary-600/25 transition-[color,transform] active:scale-[0.97] duration-150 ease-[var(--ease-out-expo)] hover:bg-primary-700"
               >
                 <Sparkles className="h-5 w-5" />
                 {cta1Text}
               </Link>
               <Link
                 href={cta2Link}
-                className="inline-flex items-center justify-center gap-2 rounded-xl border-2 border-primary-200 bg-white px-6 py-3.5 text-base font-semibold text-primary-700 transition-colors hover:border-primary-300 hover:bg-primary-50"
+                className="inline-flex items-center justify-center gap-2 rounded-xl border-2 border-primary-200 bg-white px-6 py-3.5 text-base font-semibold text-primary-700 transition-[color,transform] active:scale-[0.97] duration-150 ease-[var(--ease-out-expo)] hover:border-primary-300 hover:bg-primary-50"
               >
                 <Calendar className="h-5 w-5" />
                 {cta2Text}
@@ -213,10 +213,11 @@ export default async function HomePage() {
             </div>
 
             <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-              {services.map((service) => (
+              {services.map((service, i) => (
                 <div
                   key={service.id}
-                  className="group rounded-2xl border border-primary-100 bg-white p-6 shadow-sm transition-shadow hover:shadow-md"
+                  className="group rounded-2xl border border-primary-100 bg-white p-6 shadow-sm transition-[transform,box-shadow] hover:-translate-y-0.5 hover:shadow-md animate-fade-up opacity-0"
+                  style={{ animationDelay: `${i * 50}ms` }}
                 >
                   <div className="mb-4 inline-flex rounded-full bg-primary-50 p-3">
                     <ServiceIcon name={service.icon} />
@@ -254,11 +255,12 @@ export default async function HomePage() {
           </div>
 
           <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
-            {problemCategories.map((p) => (
+            {problemCategories.map((p, i) => (
               <Link
                 key={p.title}
                 href="/screening"
-                className="rounded-2xl border border-primary-100 bg-white p-6 transition-shadow hover:border-primary-300 hover:shadow-md"
+                className="rounded-2xl border border-primary-100 bg-white p-6 transition-[transform,box-shadow] hover:-translate-y-0.5 hover:border-primary-300 hover:shadow-md animate-fade-up opacity-0"
+                style={{ animationDelay: `${i * 50}ms` }}
               >
                 <p.icon className="mb-4 h-8 w-8 text-primary-600" />
                 <h3 className="mb-2 text-base font-semibold text-primary-950">
@@ -274,7 +276,7 @@ export default async function HomePage() {
           <div className="mt-12 text-center">
             <Link
               href="/screening"
-              className="inline-flex items-center justify-center gap-2 rounded-xl bg-primary-600 px-6 py-3.5 text-base font-semibold text-white shadow-lg shadow-primary-600/25 transition-colors hover:bg-primary-700"
+              className="inline-flex items-center justify-center gap-2 rounded-xl bg-primary-600 px-6 py-3.5 text-base font-semibold text-white shadow-lg shadow-primary-600/25 transition-[color,transform] active:scale-[0.97] hover:bg-primary-700"
             >
               <Sparkles className="h-5 w-5" />
               Пройти анкету
@@ -297,10 +299,11 @@ export default async function HomePage() {
             </div>
 
             <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-              {testimonials.map((t) => (
+              {testimonials.map((t, i) => (
                 <div
                   key={t.id}
-                  className="rounded-2xl border border-primary-100 bg-white p-6 shadow-sm"
+                  className="rounded-2xl border border-primary-100 bg-white p-6 shadow-sm animate-fade-up opacity-0"
+                  style={{ animationDelay: `${i * 50}ms` }}
                 >
                   <div className="mb-3 flex gap-0.5">
                     {Array.from({ length: t.rating }).map((_, i) => (
@@ -338,7 +341,8 @@ export default async function HomePage() {
           <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
             <Link
               href="/materials"
-              className="group rounded-2xl border border-primary-100 bg-gradient-to-br from-primary-50 to-white p-6 shadow-sm transition-shadow hover:shadow-md"
+              className="group rounded-2xl border border-primary-100 bg-gradient-to-br from-primary-50 to-white p-6 shadow-sm transition-[transform,box-shadow] hover:-translate-y-0.5 hover:shadow-md animate-fade-up opacity-0"
+              style={{ animationDelay: "0ms" }}
             >
               <BookOpen className="mb-4 h-10 w-10 text-primary-600" />
               <h3 className="mb-2 text-lg font-semibold text-primary-950">
@@ -355,7 +359,8 @@ export default async function HomePage() {
 
             <Link
               href="/courses"
-              className="group rounded-2xl border border-primary-100 bg-gradient-to-br from-accent-50 to-white p-6 shadow-sm transition-shadow hover:shadow-md"
+              className="group rounded-2xl border border-primary-100 bg-gradient-to-br from-accent-50 to-white p-6 shadow-sm transition-[transform,box-shadow] hover:-translate-y-0.5 hover:shadow-md animate-fade-up opacity-0"
+              style={{ animationDelay: "50ms" }}
             >
               <Video className="mb-4 h-10 w-10 text-accent-500" />
               <h3 className="mb-2 text-lg font-semibold text-primary-950">
@@ -372,7 +377,8 @@ export default async function HomePage() {
 
             <Link
               href="/screening"
-              className="group rounded-2xl border border-primary-100 bg-gradient-to-br from-primary-50 to-white p-6 shadow-sm transition-shadow hover:shadow-md"
+              className="group rounded-2xl border border-primary-100 bg-gradient-to-br from-primary-50 to-white p-6 shadow-sm transition-[transform,box-shadow] hover:-translate-y-0.5 hover:shadow-md animate-fade-up opacity-0"
+              style={{ animationDelay: "100ms" }}
             >
               <Shield className="mb-4 h-10 w-10 text-primary-600" />
               <h3 className="mb-2 text-lg font-semibold text-primary-950">
@@ -402,14 +408,14 @@ export default async function HomePage() {
           <div className="mt-8 flex flex-col items-center justify-center gap-4 sm:flex-row">
             <Link
               href="/screening"
-              className="inline-flex items-center gap-2 rounded-xl bg-white px-6 py-3.5 text-base font-semibold text-primary-700 shadow-lg transition-colors hover:bg-primary-50"
+              className="inline-flex items-center gap-2 rounded-xl bg-white px-6 py-3.5 text-base font-semibold text-primary-700 shadow-lg transition-[color,transform] active:scale-[0.97] hover:bg-primary-50"
             >
               <Sparkles className="h-5 w-5" />
               Пройти анкету
             </Link>
             <Link
               href="/booking"
-              className="inline-flex items-center gap-2 rounded-xl border-2 border-white/70 bg-transparent px-6 py-3.5 text-base font-semibold text-white transition-colors hover:border-white hover:bg-white/10"
+              className="inline-flex items-center gap-2 rounded-xl border-2 border-white/70 bg-transparent px-6 py-3.5 text-base font-semibold text-white transition-[color,transform] active:scale-[0.97] hover:border-white hover:bg-white/10"
             >
               <Calendar className="h-5 w-5" />
               Записаться
