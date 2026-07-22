@@ -20,6 +20,7 @@ export default async function ScreeningResultsPage({
   const results = await prisma.screeningResult.findMany({
     where,
     orderBy: { createdAt: "desc" },
+    take: 50,
     include: { user: { select: { name: true, email: true } } },
   });
 

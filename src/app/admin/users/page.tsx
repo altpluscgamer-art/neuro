@@ -22,6 +22,7 @@ export default async function UsersPage({
   const users = await prisma.user.findMany({
     where,
     orderBy: { createdAt: "desc" },
+    take: 50,
     include: {
       _count: { select: { bookings: true } },
     },

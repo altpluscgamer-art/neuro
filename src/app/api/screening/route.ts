@@ -35,7 +35,7 @@ export async function POST(request: Request) {
 
     const session = await getServerSession(authOptions);
     if (session?.user) {
-      userId = (session.user as { id?: string }).id ?? null;
+      userId = session.user.id;
     } else if (parentEmail) {
       const existing = await prisma.user.findUnique({ where: { email: parentEmail } });
       if (existing) {

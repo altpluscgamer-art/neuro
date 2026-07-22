@@ -6,7 +6,7 @@ import prisma from "@/lib/prisma";
 async function checkAdmin() {
   const session = await getServerSession(authOptions);
   if (!session?.user) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-  if ((session.user as any).role !== "admin") return NextResponse.json({ error: "Forbidden" }, { status: 403 });
+  if (session.user.role !== "admin") return NextResponse.json({ error: "Forbidden" }, { status: 403 });
   return null;
 }
 
@@ -16,10 +16,10 @@ export async function GET() {
 
   try {
     const [services, articles, courses, testimonials] = await Promise.all([
-      prisma.service.findMany({ orderBy: { order: "asc" } }),
-      prisma.article.findMany({ orderBy: { createdAt: "desc" } }),
-      prisma.course.findMany({ orderBy: { createdAt: "desc" } }),
-      prisma.testimonial.findMany({ orderBy: { order: "asc" } }),
+      prisma.service.findMany({ orderBy: { order: "asc" }, take: 50 }),
+      prisma.article.findMany({ orderBy: { createdAt: "desc" }, take: 50 }),
+      prisma.course.findMany({ orderBy: { createdAt: "desc" }, take: 50 }),
+      prisma.testimonial.findMany({ orderBy: { order: "asc" }, take: 50 }),
     ]);
 
     return NextResponse.json({ services, articles, courses, testimonials });

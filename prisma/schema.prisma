@@ -47,6 +47,8 @@ model Article {
   externalUrl   String?
   createdAt     DateTime @default(now())
   updatedAt     DateTime @updatedAt
+
+  @@index([isPublished])
 }
 
 model Course {
@@ -62,6 +64,10 @@ model Course {
   isPublished Boolean  @default(false)
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
+
+  payments Payment[]
+
+  @@index([isPublished])
 }
 
 model Testimonial {
@@ -90,6 +96,9 @@ model ScheduleSlot {
   createdAt   DateTime @default(now())
 
   bookings Booking[]
+
+  @@index([date])
+  @@index([isActive])
 }
 
 model Booking {
@@ -104,6 +113,10 @@ model Booking {
 
   user        User         @relation(fields: [userId], references: [id])
   slot        ScheduleSlot @relation(fields: [slotId], references: [id])
+
+  @@index([userId])
+  @@index([slotId])
+  @@index([status])
 }
 
 model ScreeningResult {
@@ -122,6 +135,9 @@ model ScreeningResult {
   createdAt           DateTime @default(now())
 
   user                User?    @relation(fields: [userId], references: [id])
+
+  @@index([userId])
+  @@index([completed])
 }
 
 model ConsultationRequest {
@@ -135,6 +151,8 @@ model ConsultationRequest {
   createdAt DateTime @default(now())
 
   user      User?    @relation(fields: [userId], references: [id])
+
+  @@index([status])
 }
 
 model SiteStat {
@@ -142,6 +160,8 @@ model SiteStat {
   date      String
   visits    Int      @default(0)
   createdAt DateTime @default(now())
+
+  @@index([date])
 }
 
 model Setting {
@@ -154,7 +174,7 @@ model Setting {
 model Payment {
   id          String   @id @default(cuid())
   userId      String
-  courseId     String
+  courseId     String?
   amount      Float
   status      String   @default("pending")
   provider    String
@@ -162,6 +182,7 @@ model Payment {
   createdAt   DateTime @default(now())
 
   user        User     @relation(fields: [userId], references: [id])
+  course      Course?  @relation(fields: [courseId], references: [id])
 }
 
 model ExternalReview {

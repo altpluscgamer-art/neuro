@@ -8,7 +8,7 @@ const PUBLIC_ADMIN_POSTS = new Set(["/api/admin/seed"]);
 export async function proxy(req: NextRequest) {
   const path = req.nextUrl.pathname;
   const token = await getToken({ req });
-  const isAdmin = (token as { role?: string } | null)?.role === "admin";
+  const isAdmin = token?.role === "admin";
 
   if (path.startsWith("/admin") && !isAdmin) {
     const loginUrl = new URL("/auth/login", req.url);

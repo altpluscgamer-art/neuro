@@ -25,7 +25,7 @@ export async function GET(request: Request) {
 
   if (full) {
     const session = await getServerSession(authOptions);
-    if (!session?.user || (session.user as { role?: string }).role !== "admin") {
+    if (!session?.user || session.user.role !== "admin") {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
     return NextResponse.json(settings);
@@ -40,7 +40,7 @@ export async function PUT(request: Request) {
     if (!session?.user) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
-    if ((session.user as { role?: string }).role !== "admin") {
+    if (session.user.role !== "admin") {
       return NextResponse.json({ error: "Forbidden" }, { status: 403 });
     }
 

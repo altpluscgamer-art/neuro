@@ -10,7 +10,7 @@ export async function GET() {
     if (!session?.user) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
-    if ((session.user as { role?: string }).role !== "admin") {
+    if (session.user.role !== "admin") {
       return NextResponse.json({ error: "Forbidden" }, { status: 403 });
     }
 
@@ -36,22 +36,11 @@ export async function POST(request: Request) {
       );
     }
 
-    const slot = await prisma.scheduleSlot.findUnique({ where: { id: slotId } });
-    if (!slot) {
-      return NextResponse.json({ error: "Slot not found" }, { status: 404 });
-    }
-    if (!slot.isActive) {
-      return NextResponse.json({ error: "Slot is not active" }, { status: 400 });
-    }
-    if (slot.bookedSeats >= slot.totalSeats) {
-      return NextResponse.json({ error: "No available seats" }, { status: 400 });
-    }
-
     let userId: string;
 
     const session = await getServerSession(authOptions);
     if (session?.user) {
-      userId = (session.user as { id?: string }).id!;
+      userId = session.user.id;
     } else if (parentEmail) {
       const existing = await prisma.user.findUnique({ where: { email: parentEmail } });
       if (existing) {
@@ -81,24 +70,42 @@ export async function POST(request: Request) {
       }
     }
 
-    const booking = await prisma.booking.create({
-      data: {
-        userId,
-        slotId,
-        childName,
-        childAge: parseInt(childAge, 10),
-        notes: notes || null,
-        status: "pending",
-      },
-    });
+    const booking = await prisma.$transaction(async (tx) => {
+      const slot = await tx.scheduleSlot.findUnique({ where: { id: slotId } });
+      if (!slot) throw new Error("Slot not found");
+      if (!slot.isActive) throw new Error("Slot is not active");
+      if (slot.bookedSeats >= slot.totalSeats) throw new Error("No available seats");
 
-    await prisma.scheduleSlot.update({
-      where: { id: slotId },
-      data: { bookedSeats: { increment: 1 } },
+      const created = await tx.booking.create({
+        data: {
+          userId,
+          slotId,
+          childName,
+          childAge: parseInt(childAge, 10),
+          notes: notes || null,
+          status: "pending",
+        },
+      });
+      await tx.scheduleSlot.update({
+        where: { id: slotId },
+        data: { bookedSeats: { increment: 1 } },
+      });
+      return created;
     });
 
     return NextResponse.json(booking, { status: 201 });
-  } catch {
+  } catch (error) {
+    if (error instanceof Error) {
+      if (error.message === "Slot not found") {
+        return NextResponse.json({ error: "Slot not found" }, { status: 404 });
+      }
+      if (error.message === "Slot is not active") {
+        return NextResponse.json({ error: "Slot is not active" }, { status: 400 });
+      }
+      if (error.message === "No available seats") {
+        return NextResponse.json({ error: "No available seats" }, { status: 400 });
+      }
+    }
     return NextResponse.json({ error: "Failed to create booking" }, { status: 500 });
   }
 }
