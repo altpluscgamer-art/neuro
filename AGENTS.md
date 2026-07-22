@@ -44,6 +44,38 @@ Key resources from the directory:
 Maturity tags: **production** (stable, safe to build on), **beta** (works but evolving), **experimental** (early stage).
 
 Always check the trust boundary before enabling community skills — verify who can trigger it, what credentials it reads, and how to stop it.
+
+## Emil Kowalski's Design Engineering Skills
+
+Source: https://github.com/emilkowalski/skills
+
+Skills for design engineers — UI polish, animation decisions, component design, and the invisible details that make software feel great. Based on experience at Vercel and Linear.
+
+Key skills:
+- **emil-design-eng** — Main skill: animation philosophy, component building principles, CSS transform mastery, clip-path animation, gesture/drag interactions, performance rules, accessibility, stagger animations, debugging
+- **review-animations** — Strict animation review based on Emil's rules
+- **improve-animations** — Audit all animations in codebase, get prioritized plans
+- **find-animation-opportunities** — Find places that benefit from motion (and what NOT to animate)
+- **animation-vocabulary** — Get better animations by using the right words
+- **apple-design** — Apple's interface design principles translated for the web
+- **pick-ui-library** — Pick the right library instead of hand-rolling or installing abandoned packages
+
+Core principles to apply:
+- Taste is trained, not innate — study why best interfaces feel good
+- Unseen details compound — invisible correctness creates interfaces people love
+- Only animate `transform` and `opacity` (GPU-accelerated)
+- Never use `ease-in` for UI — use `ease-out` with custom cubic-bezier curves
+- UI animations under 300ms — 100-160ms for button press, 150-250ms for dropdowns
+- Buttons must feel responsive: `transform: scale(0.97)` on `:active`
+- Never animate from `scale(0)` — start from `scale(0.95)` with `opacity: 0`
+- Popovers scale from trigger (not center); modals stay centered
+- Use `@media (prefers-reduced-motion: reduce)` for accessibility
+- Gate hover animations behind `@media (hover: hover) and (pointer: fine)`
+- CSS animations beat JS under load (off main thread)
+- Stagger delays: 30-80ms between items
+- Review animations the next day with fresh eyes
+
+Use these skills when building UI components, adding animations, reviewing interface quality, or making design decisions.
 <!-- END:skills-and-knowledge -->
 
 <!-- BEGIN:project-context -->
