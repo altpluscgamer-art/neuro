@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { sanitizeHtml } from "@/lib/sanitize";
 
 interface AdBlockProps {
   position: "header" | "sidebar" | "article" | "footer";
@@ -38,7 +39,7 @@ export default function AdBlock({ position }: AdBlockProps) {
   if (settings.ads_custom_html) {
     return (
       <div data-ad-position={position}>
-        <div dangerouslySetInnerHTML={{ __html: settings.ads_custom_html }} />
+        <div dangerouslySetInnerHTML={{ __html: sanitizeHtml(settings.ads_custom_html) }} />
       </div>
     );
   }

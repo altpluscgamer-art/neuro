@@ -8,11 +8,16 @@ export async function POST(request: Request) {
   try {
     const session = await getServerSession(authOptions);
     if (!session?.user) {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+      return NextResponse.json({ error: "Authentication required" }, { status: 401 });
+    }
+
+    const userId = (session.user as { id?: string }).id;
+    if (!userId) {
+      return NextResponse.json({ error: "Authentication required" }, { status: 401 });
     }
 
     const body = await request.json();
-    const { courseId, userId } = body;
+    const { courseId } = body;
 
     if (!courseId) {
       return NextResponse.json({ error: "courseId is required" }, { status: 400 });
@@ -33,11 +38,9 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: "YooKassa not configured" }, { status: 500 });
     }
 
-    const internalUserId = userId ?? (session.user as any).id;
-
     const payment = await prisma.payment.create({
       data: {
-        userId: internalUserId,
+        userId,
         courseId,
         amount: course.price,
         status: "pending",

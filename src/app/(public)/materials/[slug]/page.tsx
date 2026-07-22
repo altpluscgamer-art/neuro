@@ -4,6 +4,7 @@ import prisma from "@/lib/prisma";
 import SEOHead from "@/components/SEOHead";
 import { BookOpen, Tag, ArrowLeft, Calendar } from "lucide-react";
 import type { Metadata } from "next";
+import { formatContent } from "@/lib/format-content";
 
 export async function generateMetadata({
   params,
@@ -97,7 +98,7 @@ export default async function ArticlePage({
             </header>
 
             <div className="prose prose-lg max-w-none prose-headings:text-gray-900 prose-p:text-gray-700 prose-a:text-indigo-600 prose-strong:text-gray-900">
-              <div dangerouslySetInnerHTML={{ __html: article.content }} />
+              <div dangerouslySetInnerHTML={{ __html: formatContent(article.content) }} />
             </div>
           </article>
 

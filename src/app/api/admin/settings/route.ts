@@ -3,9 +3,35 @@ import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import { getAllSettings, setSetting } from "@/lib/settings";
 
-export async function GET() {
+const SENSITIVE_KEYS = [
+  "telegram_bot_token",
+  "smtp_pass",
+  "yookassa_secret_key",
+  "yookassa_shop_id",
+];
+
+function maskSettings(settings: Record<string, string>): Record<string, string> {
+  const filtered: Record<string, string> = {};
+  for (const [key, value] of Object.entries(settings)) {
+    filtered[key] = SENSITIVE_KEYS.includes(key) ? (value ? "••••••••" : "") : value;
+  }
+  return filtered;
+}
+
+export async function GET(request: Request) {
   const settings = await getAllSettings();
-  return NextResponse.json(settings);
+  const { searchParams } = new URL(request.url);
+  const full = searchParams.get("full") === "true";
+
+  if (full) {
+    const session = await getServerSession(authOptions);
+    if (!session?.user || (session.user as { role?: string }).role !== "admin") {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
+    return NextResponse.json(settings);
+  }
+
+  return NextResponse.json(maskSettings(settings));
 }
 
 export async function PUT(request: Request) {

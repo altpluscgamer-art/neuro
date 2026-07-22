@@ -17,6 +17,7 @@ import {
   X,
 } from "lucide-react";
 import { clsx } from "clsx";
+import { signOut } from "next-auth/react";
 
 const navItems = [
   { href: "/admin", label: "Dashboard", icon: LayoutDashboard },
@@ -46,9 +47,8 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
       <aside
         className={clsx(
           "fixed inset-y-0 left-0 z-40 flex w-64 flex-col border-r border-gray-200 bg-white transition-transform lg:static lg:translate-x-0",
-          sidebarOpen ? "translate-x-0" : "-translate-x-0 lg:translate-x-0"
+          sidebarOpen ? "translate-x-0" : "-translate-x-full lg:translate-x-0"
         )}
-        style={{ transform: sidebarOpen ? "translateX(0)" : undefined }}
       >
         <div className="flex h-16 items-center gap-3 border-b border-gray-200 px-6">
           <Brain className="h-8 w-8 text-violet-600" />
@@ -78,13 +78,14 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
         </nav>
 
         <div className="border-t border-gray-200 p-3">
-          <Link
-            href="/"
+          <button
+            onClick={() => signOut({ callbackUrl: "/" })}
             className="flex w-full items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium text-gray-600 transition-colors hover:bg-gray-100 hover:text-gray-900"
+            style={{ minHeight: "44px" }}
           >
             <LogOut className="h-5 w-5" />
             Выйти
-          </Link>
+          </button>
         </div>
       </aside>
 
