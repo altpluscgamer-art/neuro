@@ -1,6 +1,6 @@
 import Link from "next/link";
 import prisma from "@/lib/prisma";
-import { Video, Play, Clock } from "lucide-react";
+import { Video, Play, Clock, BookOpen } from "lucide-react";
 
 export const metadata = {
   title: "Курсы — Нейропсихолог онлайн",
@@ -84,6 +84,23 @@ export default async function CoursesPage() {
             ))}
           </div>
         )}
+
+        <div className="mt-16 rounded-2xl border border-gray-100 bg-gradient-to-br from-indigo-50 to-white p-8 text-center">
+          <BookOpen className="mx-auto mb-4 h-10 w-10 text-indigo-600" />
+          <h2 className="mb-2 text-xl font-bold text-gray-900">
+            Читайте также наши статьи
+          </h2>
+          <p className="mb-6 text-sm text-gray-600">
+            Полезные материалы о развитии, воспитании и нейропсихологии детей
+          </p>
+          <Link
+            href="/materials"
+            className="inline-flex items-center gap-2 rounded-xl bg-indigo-600 px-6 py-3 text-base font-semibold text-white shadow-sm transition-colors hover:bg-indigo-700"
+          >
+            <BookOpen className="h-5 w-5" />
+            Перейти к материалам
+          </Link>
+        </div>
       </div>
     </div>
   );

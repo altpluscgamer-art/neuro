@@ -1,12 +1,14 @@
 import Link from "next/link";
 import prisma from "@/lib/prisma";
-import { BookOpen, Search, Tag, Send } from "lucide-react";
+import { BookOpen, Search, Tag, Send, Video } from "lucide-react";
 
 export const metadata = {
   title: "Материалы — Нейропсихолог онлайн",
   description: "Полезные статьи и материалы для родителей о развитии детей",
 };
 
+// TODO(Issue #14): Refactor category filtering to use /materials/category/[slug]
+// route segments instead of query params for better SEO and URL structure.
 export default async function MaterialsPage({
   searchParams,
 }: {
@@ -208,6 +210,24 @@ export default async function MaterialsPage({
             })}
           </div>
         )}
+
+        <div className="mt-16 rounded-2xl border border-gray-100 bg-gradient-to-br from-violet-50 to-indigo-50 p-8 text-center">
+          <Video className="mx-auto mb-4 h-10 w-10 text-violet-600" />
+          <h2 className="mb-2 text-xl font-bold text-gray-900">
+            Также смотрите наши онлайн-курсы
+          </h2>
+          <p className="mb-6 text-sm text-gray-600">
+            Профессиональные курсы для родителей и специалистов по
+            нейропсихологии и развитию детей
+          </p>
+          <Link
+            href="/courses"
+            className="inline-flex items-center gap-2 rounded-xl bg-violet-600 px-6 py-3 text-base font-semibold text-white shadow-sm transition-colors hover:bg-violet-700"
+          >
+            <Video className="h-5 w-5" />
+            Перейти к курсам
+          </Link>
+        </div>
       </div>
     </div>
   );

@@ -2,6 +2,7 @@ import { notFound } from "next/navigation";
 import Link from "next/link";
 import prisma from "@/lib/prisma";
 import SEOHead from "@/components/SEOHead";
+import Breadcrumbs from "@/components/Breadcrumbs";
 import { Video, Play, Clock, ArrowLeft, BookOpen } from "lucide-react";
 import type { Metadata } from "next";
 import { formatContent } from "@/lib/format-content";
@@ -55,6 +56,7 @@ export default async function CoursePage({
         price={course.price > 0 ? course.price : undefined}
       />
       <div className="mx-auto max-w-4xl px-4 py-12 sm:px-6 lg:px-8">
+        <Breadcrumbs items={[{ label: "Главная", href: "/" }, { label: "Курсы", href: "/courses" }, { label: course.title }]} />
         <Link
           href="/courses"
           className="mb-8 inline-flex items-center gap-2 text-sm font-medium text-indigo-600 hover:text-indigo-700 transition-colors"

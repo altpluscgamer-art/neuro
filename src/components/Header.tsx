@@ -2,6 +2,7 @@
 
 import { useState, useEffect, type CSSProperties } from "react";
 import Link from "next/link";
+import { usePathname } from "next/navigation";
 import { Brain, Menu, X, Send, ExternalLink } from "lucide-react";
 
 const navLinks = [
@@ -9,9 +10,10 @@ const navLinks = [
   { href: "/services", label: "Услуги" },
   { href: "/materials", label: "Материалы" },
   { href: "/courses", label: "Курсы" },
-  { href: "/booking", label: "Записаться" },
   { href: "/screening", label: "Анкета" },
 ];
+
+const ctaLink = { href: "/booking", label: "Записаться" };
 
 const touchAction: CSSProperties = { touchAction: "manipulation" };
 
@@ -21,6 +23,7 @@ export default function Header() {
     telegram?: string;
     instagram?: string;
   }>({});
+  const pathname = usePathname();
 
   useEffect(() => {
     fetch("/api/admin/settings")
@@ -48,16 +51,30 @@ export default function Header() {
 
         {/* Desktop nav */}
         <nav className="hidden items-center gap-1 lg:flex">
-          {navLinks.map(({ href, label }) => (
-            <Link
-              key={href}
-              href={href}
-              className="rounded-lg px-3 py-2 text-sm font-medium text-gray-700 transition-colors hover:bg-primary-50 hover:text-primary-700"
-              style={touchAction}
-            >
-              {label}
-            </Link>
-          ))}
+          {navLinks.map(({ href, label }) => {
+            const isActive = pathname === href;
+            return (
+              <Link
+                key={href}
+                href={href}
+                className={`rounded-lg px-3 py-2 text-sm font-medium transition-colors ${
+                  isActive
+                    ? "text-primary-700 bg-primary-50"
+                    : "text-gray-700 hover:bg-primary-50 hover:text-primary-700"
+                }`}
+                style={touchAction}
+              >
+                {label}
+              </Link>
+            );
+          })}
+          <Link
+            href={ctaLink.href}
+            className="ml-2 rounded-lg bg-accent-500 px-4 py-2 text-sm font-semibold text-white transition-colors hover:bg-accent-600"
+            style={touchAction}
+          >
+            {ctaLink.label}
+          </Link>
         </nav>
 
         {/* Desktop social + mobile menu button */}
@@ -105,17 +122,32 @@ export default function Header() {
       {mobileOpen && (
         <div className="border-t border-primary-100 bg-white lg:hidden">
           <nav className="mx-auto max-w-7xl space-y-1 px-4 pb-4 pt-2 sm:px-6">
-            {navLinks.map(({ href, label }) => (
-              <Link
-                key={href}
-                href={href}
-                className="block rounded-lg px-3 py-3 text-base font-medium text-gray-700 transition-colors hover:bg-primary-50 hover:text-primary-700"
-                onClick={() => setMobileOpen(false)}
-                style={{ ...touchAction, minHeight: "44px" }}
-              >
-                {label}
-              </Link>
-            ))}
+            {navLinks.map(({ href, label }) => {
+              const isActive = pathname === href;
+              return (
+                <Link
+                  key={href}
+                  href={href}
+                  className={`block rounded-lg px-3 py-3 text-base font-medium transition-colors ${
+                    isActive
+                      ? "text-primary-700 bg-primary-50"
+                      : "text-gray-700 hover:bg-primary-50 hover:text-primary-700"
+                  }`}
+                  onClick={() => setMobileOpen(false)}
+                  style={{ ...touchAction, minHeight: "44px" }}
+                >
+                  {label}
+                </Link>
+              );
+            })}
+            <Link
+              href={ctaLink.href}
+              className="block rounded-lg bg-accent-500 px-3 py-3 text-center text-base font-semibold text-white transition-colors hover:bg-accent-600"
+              onClick={() => setMobileOpen(false)}
+              style={{ ...touchAction, minHeight: "44px" }}
+            >
+              {ctaLink.label}
+            </Link>
             {(socialLinks.telegram || socialLinks.instagram) && (
               <div className="flex items-center gap-3 pt-3">
                 {socialLinks.telegram && (

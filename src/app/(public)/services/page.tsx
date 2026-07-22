@@ -77,6 +77,9 @@ const steps = [
   },
 ];
 
+// TODO(Issue #15): Create /services/[slug] detail pages for each service.
+// Currently service cards link directly to /booking; individual service pages
+// would improve SEO and let users learn more before booking.
 export default async function ServicesPage() {
   const services: ServiceRow[] = await prisma.service.findMany({
     where: { isActive: true },
@@ -182,6 +185,48 @@ export default async function ServicesPage() {
                 </p>
               </div>
             ))}
+          </div>
+        </div>
+      </section>
+
+      <section className="bg-white py-20 sm:py-28">
+        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+          <div className="grid gap-6 sm:grid-cols-2">
+            <Link
+              href="/materials"
+              className="group flex flex-col items-start rounded-2xl border border-primary-100 bg-cream p-6 shadow-sm transition-shadow hover:shadow-md"
+            >
+              <BookOpen className="mb-4 h-8 w-8 text-primary-600" />
+              <h2 className="mb-2 text-lg font-semibold text-primary-950">
+                Полезные статьи
+              </h2>
+              <p className="text-sm leading-relaxed text-gray-600">
+                Читайте материалы о развитии детей, нейропсихологии и
+                практических рекомендациях для родителей.
+              </p>
+              <span className="mt-4 inline-flex items-center gap-1 text-sm font-medium text-primary-600 transition-colors group-hover:text-primary-700">
+                Перейти к материалам
+                <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-0.5" />
+              </span>
+            </Link>
+
+            <Link
+              href="/screening"
+              className="group flex flex-col items-start rounded-2xl border border-primary-100 bg-primary-50 p-6 shadow-sm transition-shadow hover:shadow-md"
+            >
+              <Sparkles className="mb-4 h-8 w-8 text-primary-600" />
+              <h2 className="mb-2 text-lg font-semibold text-primary-950">
+                Пройдите анкету
+              </h2>
+              <p className="text-sm leading-relaxed text-gray-600">
+                Бесплатная скрининг-анкета поможет определить, какая услуга
+                подойдёт вашему ребёнку.
+              </p>
+              <span className="mt-4 inline-flex items-center gap-1 text-sm font-medium text-primary-600 transition-colors group-hover:text-primary-700">
+                Пройти анкету
+                <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-0.5" />
+              </span>
+            </Link>
           </div>
         </div>
       </section>

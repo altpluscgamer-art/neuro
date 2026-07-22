@@ -255,9 +255,10 @@ export default async function HomePage() {
 
           <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
             {problemCategories.map((p) => (
-              <div
+              <Link
                 key={p.title}
-                className="rounded-2xl border border-primary-100 bg-white p-6 transition-colors hover:border-primary-300"
+                href="/screening"
+                className="rounded-2xl border border-primary-100 bg-white p-6 transition-shadow hover:border-primary-300 hover:shadow-md"
               >
                 <p.icon className="mb-4 h-8 w-8 text-primary-600" />
                 <h3 className="mb-2 text-base font-semibold text-primary-950">
@@ -266,7 +267,7 @@ export default async function HomePage() {
                 <p className="text-sm leading-relaxed text-gray-600">
                   {p.desc}
                 </p>
-              </div>
+              </Link>
             ))}
           </div>
 

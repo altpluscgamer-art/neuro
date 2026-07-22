@@ -282,6 +282,24 @@ export default async function AboutPage() {
               Пройти анкету
             </Link>
           </div>
+
+          <div className="mt-10 flex flex-wrap items-center justify-center gap-x-6 gap-y-2 text-sm text-primary-100">
+            <span className="font-medium">Смотрите также:</span>
+            <Link
+              href="/services"
+              className="inline-flex items-center gap-1.5 text-primary-100 underline-offset-4 transition-colors hover:text-white hover:underline"
+            >
+              <BookOpen className="h-4 w-4" />
+              Услуги
+            </Link>
+            <Link
+              href="/materials"
+              className="inline-flex items-center gap-1.5 text-primary-100 underline-offset-4 transition-colors hover:text-white hover:underline"
+            >
+              <BookOpen className="h-4 w-4" />
+              Материалы
+            </Link>
+          </div>
         </div>
       </section>
     </>
