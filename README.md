@@ -1,34 +1,42 @@
 # Нейро — Онлайн-платформа для родителей и детских специалистов
 
-## О проекте
-Онлайн-платформа для нейропсихологической помощи детям от 1 до 13 лет.
+Онлайн-платформа для нейропсихологической помощи детям от 1 до 13 лет. Диагностика, коррекция, скрининг-анкета, курсы, статьи, расписание, Telegram-интеграция.
 
 ## Технологии
-- Next.js 16 (App Router)
-- TypeScript
-- Tailwind CSS v4
-- Prisma 7 + SQLite (локально) / PostgreSQL (продакшен)
-- NextAuth.js
-- @react-pdf/renderer
+
+- **Next.js 16** (App Router, Turbopack)
+- **TypeScript** + **Tailwind CSS v4**
+- **Prisma 7** + SQLite (локально) / PostgreSQL (продакшен)
+- **NextAuth.js v4** (credentials provider)
+- **@react-pdf/renderer** (PDF-отчёты)
+- **Vitest** (тесты)
 
 ## Быстрый старт
 
-### Установка
+### Вариант 1 — Один клик (Windows)
+
+Дважды кликните файл **`setup.bat`** в корне проекта. Скрипт:
+1. Проверит Node.js и npm
+2. Установит зависимости
+3. Сгенерирует Prisma-клиент
+4. Создаст базу данных (миграции)
+5. Заполнит тестовыми данными
+6. Запустит сервер
+
+### Вариант 2 — Вручную
+
 ```bash
 npm install
 npx prisma generate
 npx prisma migrate dev
+npm run build
+npx next start --hostname 0.0.0.0 -p 3000
 ```
-
-### Запуск
-```bash
-npm run dev
-```
-
-Открыть http://localhost:3000
 
 ### Заполнение БД тестовыми данными
-Выполнить POST запрос:
+
+После запуска сервера выполните POST-запрос:
+
 ```bash
 curl -X POST http://localhost:3000/api/admin/seed
 ```
@@ -38,120 +46,254 @@ curl -X POST http://localhost:3000/api/admin/seed
 Invoke-RestMethod -Uri "http://localhost:3000/api/admin/seed" -Method POST
 ```
 
-## Вход в админ-панель
+### Доступ с других устройств в сети
 
-URL: http://localhost:3000/auth/login
+Сервер запускается на `0.0.0.0:3000` — доступен с телефона по адресу:
+```
+http://<IP-компьютера>:3000
+```
+
+Если не открывается — добавьте правило Firewall:
+```powershell
+# От имени администратора:
+New-NetFirewallRule -DisplayName "NEURO Dev Server" -Direction Inbound -Protocol TCP -LocalPort 3000 -Action Allow -Profile Private
+```
+
+## Вход в админ-панель
 
 | Поле | Значение |
 |------|----------|
+| URL | http://localhost:3000/auth/login |
 | Email | admin@neuro.ru |
 | Пароль | admin123 |
 
 После входа: http://localhost:3000/admin
 
+**⚠️ Важно:** После первого деплоя измените пароль администратора или создайте нового через seed с другими данными.
+
+## Возможности
+
+### Публичная часть
+
+- **Главная** — hero, услуги, категории проблем, отзывы, CTA
+- **Обо мне** — квалификация, принципы, отзывы, соцсети
+- **Услуги** — список услуг + этапы работы
+- **Материалы** — статьи с категориями, breadcrumbs, SEO
+- **Курсы** — видео-курсы с описанием и ценой
+- **Анкета** — 7-шаговый скрининг на основе методики А.Р. Лурии:
+  - Возраст, опасения, частота, сильные стороны, контакты
+  - Персональный отчёт с нейропсихологическим профилем
+  - Выявление 7 синдромов (энергодефицит, регуляторный, внимания и др.)
+  - PDF-отчёт для скачивания
+- **Запись** — выбор слота расписания, форма с контактами
+- **Политика конфиденциальности** и **Пользовательское соглашение**
+
+### Админ-панель
+
+- **Дашборд** — статистика посещений (график за 7 дней), счётчики, последние анкеты и запросы
+- **Расписание** — CRUD слотов (дата, время, тип, места)
+- **Контент** — 5 вкладок:
+  - Услуги (CRUD)
+  - Статьи (CRUD, с транслитерацией slug)
+  - Курсы (CRUD)
+  - Отзывы (CRUD)
+  - **Страницы** — визуальный редактор контента всех страниц сайта:
+    - 9 вкладок: Главная, Обо мне, Услуги, Материалы, Курсы, Анкета, Запись, Контакты, Правовые
+    - Превью в реальном времени (слева — как выглядит, справа — редактор)
+    - Группировка по блокам (Hero, Кнопки, Отзывы, и т.д.)
+- **Результаты анкет** — структурированный просмотр: профиль, синдромы, рекомендации, PDF
+- **Запросы** — консультационные запросы со статусами
+- **Пользователи** — список, поиск
+- **Настройки** — 8 вкладок интеграций
+
 ## Настройка интеграций
 
-Все настройки в админ-панели: `/admin/settings`
+Все настройки в админ-панели: **`/admin/settings`**
 
 ### Telegram-бот
-1. Откройте @BotFather в Telegram
-2. Создайте бота: `/newbot`
-3. Получите **Bot Token** → вставьте в поле "Bot Token"
-4. Получите **Chat ID**: напишите @userinfobot, свой ID → вставьте в "Chat ID"
-5. Укажите ссылку на ваш канал (например, https://t.me/your_channel)
-6. Включите "Авто-синхронизация" — посты из канала будут автоматически появляться в разделе "Материалы"
 
-**Webhook:** После настройки, откройте в браузере:
-`http://localhost:3000/api/telegram/webhook` (GET запрос установит webhook)
+**Две функции:**
+
+1. **Авто-синхронизация постов (Double Life)** — посты из Telegram-канала автоматически появляются в разделе «Материалы» на сайте, со ссылкой на оригинал в Telegram
+
+2. **Уведомления** — при заполнении анкеты родителем, администратор получает сообщение в Telegram с данными (имя, телефон, проблемы)
+
+**Настройка:**
+
+1. Откройте **@BotFather** в Telegram → `/newbot` → получите **Bot Token**
+2. Напишите **@userinfobot** → получите ваш **Chat ID**
+3. Админка → Настройки → Telegram:
+   - Вставьте Bot Token
+   - Вставьте Chat ID
+   - Укажите ссылку на канал (например, `https://t.me/your_channel`)
+   - Включите «Авто-синхронизация статей»
+4. Добавьте бота как **администратора** в ваш Telegram-канал
+5. Откройте в браузере `http://ваш-домен/api/telegram/webhook` (GET-запрос установит webhook)
 
 ### SMTP (email-уведомления)
-1. Для Yandex: host=smtp.yandex.ru, port=587, user=your@yandex.ru, pass=app_password
-2. Для Gmail: host=smtp.gmail.com, port=587, user=your@gmail.com, pass=app_password
-3. Для Mail.ru: host=smtp.mail.ru, port=587
-4. Получите пароль приложения (не обычный пароль!) в настройках почтового сервиса
+
+| Сервис | Хост | Порт |
+|--------|------|------|
+| Yandex | smtp.yandex.ru | 587 |
+| Gmail | smtp.gmail.com | 587 |
+| Mail.ru | smtp.mail.ru | 587 |
+
+**Важно:** Нужен **пароль приложения**, не обычный пароль. Создаётся в настройках безопасности почтового сервиса.
 
 ### Яндекс.Метрика
+
 1. Зарегистрируйтесь на https://metrika.yandex.ru
-2. Создайте счётчик для вашего сайта
-3. Скопируйте **номер счётчика** → вставьте в поле "ID счётчика"
-4. Включите toggle
+2. Создайте счётчик → скопируйте **номер счётчика**
+3. Вставьте в админку → включите toggle
 
 ### Оплата (YooKassa)
-1. Зарегистрируйтесь на https://yookassa.ru
-2. В личном кабинете: Настройки → API ключи
-3. Скопируйте **shopId** и **Секретный ключ**
-4. Вставьте в соответствующие поля в админке
-5. Для тестирования включите "Тестовый режим"
-6. Webhook для уведомлений: `https://ваш-домен/api/payments/yookassa/notification`
 
-### Реклама (Яндекс РСЯ)
-1. Зарегистрируйтесь в Рекламной сети Яндекса
-2. Создайте рекламный блок
-3. Скопируйте **client ID** → вставьте в поле
+1. Зарегистрируйтесь на https://yookassa.ru
+2. Личный кабинет → Настройки → API ключи
+3. Скопируйте **shopId** и **Секретный ключ**
+4. Вставьте в админку
+5. Для тестирования включите «Тестовый режим»
+6. Webhook для уведомлений об оплате: `https://ваш-домен/api/payments/yookassa/notification`
+
+### Реклама
+
+- **Яндекс РСЯ** — зарегистрируйтесь, создайте блок, скопируйте Client ID
+- **Google AdSense** — аналогично
+- **Произвольный HTML** — вставьте любой рекламный код
 
 ### Отзывы (Яндекс.Карты / Google Maps)
-1. Найдите вашу организацию на Яндекс.Картах
-2. Скопируйте URL страницы отзывов → вставьте в "Yandex URL"
-3. Аналогично для Google Maps
+
+1. Найдите организацию на Яндекс.Картах → скопируйте URL отзывов
+2. Вставьте в админку → включите авто-синхронизацию
 
 ### Социальные сети
-Просто вставьте ссылки на ваши страницы:
-- Instagram: https://instagram.com/your_account
-- Telegram: https://t.me/your_channel
-- WhatsApp: https://wa.me/79990000000
-- VK: https://vk.com/your_group
-- YouTube: https://youtube.com/@your_channel
+
+Вставьте ссылки в админке:
+- Instagram: `https://instagram.com/your_account`
+- Telegram: `https://t.me/your_channel`
+- WhatsApp: `https://wa.me/79990000000`
+- VK: `https://vk.com/your_group`
+- YouTube: `https://youtube.com/@your_channel`
 
 ## Структура проекта
+
 ```
 src/
   app/
-    (public)/          — публичные страницы (с Header/Footer)
-      page.tsx         — главная
-      about/           — обо мне
-      services/        — услуги
-      materials/       — статьи
-      courses/         — курсы
-      booking/         — запись на приём
-      screening/       — анкета
-      auth/            — вход/регистрация
-    admin/             — админ-панель (без публичного Header/Footer)
-      page.tsx         — дашборд с аналитикой
-      schedule/        — расписание
-      content/         — управление контентом
-      screening-results/ — результаты анкет
-      consultation-requests/ — запросы
-      users/           — пользователи
-      settings/        — настройки интеграций
-    api/               — API routes
-  components/           — React-компоненты
-  lib/                  — утилиты (prisma, auth, screening-logic, settings, notifications)
+    (public)/              — публичные страницы (с Header/Footer)
+      page.tsx             — главная
+      about/               — обо мне
+      services/            — услуги
+      materials/           — статьи + [slug]
+      courses/             — курсы + [slug]
+      booking/             — запись на приём
+      screening/           — анкета (7 шагов)
+      auth/                — вход / регистрация
+      privacy/             — политика конфиденциальности
+      terms/               — пользовательское соглашение
+    admin/                 — админ-панель (без Header/Footer)
+      page.tsx             — дашборд с аналитикой
+      schedule/            — расписание (CRUD)
+      content/             — контент (услуги, статьи, курсы, отзывы, страницы)
+      screening-results/   — результаты анкет
+      consultation-requests/ — запросы на консультацию
+      users/               — пользователи
+      settings/            — настройки интеграций (8 вкладок)
+    api/
+      admin/
+        content/{type}/    — CRUD для статей, услуг, курсов, отзывов
+        settings/          — настройки (GET публичный, PUT admin)
+        page-content/      — контент страниц (GET/PUT)
+        schedule/          — расписание (GET публичный, CRUD admin)
+        stats, analytics   — статистика
+        seed/              — заполнение БД
+      auth/                — NextAuth + регистрация
+      bookings/            — запись (транзакция с проверкой мест)
+      screening/           — анкета + генерация отчёта
+      screening/pdf/[id]   — PDF-отчёт
+      consultation-requests/ — запросы на консультацию
+      payments/yookassa/   — платёжная система
+      telegram/webhook/    — Telegram бот (синхронизация + уведомления)
+      reviews/sync/        — отзывы из Яндекс/Google
+      track-visit/         — аналитика посещений
+    sitemap.ts             — динамический sitemap.xml
+    robots.ts              — robots.txt
+    not-found.tsx          — кастомная 404 страница
+  components/              — Header, Footer, Breadcrumbs, ErrorBoundary, etc.
+  lib/                     — prisma, auth, screening-logic, settings, notifications, page-content, sanitize
+  proxy.ts                 — защита /admin/* и /api/admin/* (Next.js 16 proxy)
+  types/                   — типы NextAuth
+prisma/
+  schema.prisma            — схема БД (модели, индексы, связи)
+  migrations/              — миграции
+scripts/
+  backup.ps1               — скрипт бэкапа (БД + файлы + JSON-экспорт)
+  install-backup-schedule.ps1 — установка еженедельного бэкапа
+setup.bat                  —一键 развёртывание
+dev.bat                    — запуск в режиме разработки
+backup.bat                 — ручной бэкап
+install-backup.bat         — установка авто-бэкапа (Windows Task Scheduler)
+uninstall-backup.bat       — удаление авто-бэкапа
 ```
 
+## Бэкапы
+
+### Ручной бэкап
+Дважды кликните **`backup.bat`** — создаст копию БД, архив файлов и JSON-экспорт данных в папку `backups/`.
+
+### Автоматический бэкап (каждое воскресенье 03:00)
+1. Правый клик на **`install-backup.bat`** → **Запуск от имени администратора**
+2. Подтвердите установку задачи в Windows Task Scheduler
+3. Бэкапы будут создаваться автоматически, хранятся последние 8 копий
+
+Для удаления: **`uninstall-backup.bat`**
+
 ## Тесты
+
 ```bash
 npm test
 ```
 
+13 тестов: screening-logic (7), settings (3), API routes (3).
+
 ## Сборка
+
 ```bash
 npm run build
 ```
 
-## Деплой на Vercel
+## Деплой на Vercel + PostgreSQL
+
 1. Создайте проект на Vercel, подключите GitHub-репозиторий
-2. Создайте PostgreSQL базу (Supabase/Neon)
+2. Создайте PostgreSQL базу (Supabase / Neon — бесплатно)
 3. В переменных окружения Vercel укажите:
    - `DATABASE_URL` — строка подключения к PostgreSQL
-   - `NEXTAUTH_SECRET` — случайная строка
-   - `NEXTAUTH_URL` — ваш домен
+   - `NEXTAUTH_SECRET` — случайная строка (`openssl rand -base64 32`)
+   - `NEXTAUTH_URL` — ваш домен (`https://your-app.vercel.app`)
 4. Измените в `prisma/schema.prisma`: `provider = "postgresql"`
-5. Выполните `npx prisma migrate deploy`
-6. Заполните `TELEGRAM_BOT_TOKEN`, `SMTP_*`, `YOOKASSA_*` в Vercel env vars
+5. Удалите `src/lib/prisma.ts` (используйте стандартный Prisma Client без SQLite-адаптера)
+6. Выполните `npx prisma migrate deploy`
 7. После деплоя выполните POST `/api/admin/seed` для создания админа
+8. Настройте все интеграции в админке: `/admin/settings`
 
-## Переменные окружения
-См. `.env.example` для полного списка.
+## Безопасность
 
-## License
+- **proxy.ts** защищает все `/admin/*` и `/api/admin/*` маршруты
+- Секретные ключи в API настроек маскируются (`••••••••`)
+- PDF-отчёты требуют авторизацию
+- Оплата привязывается к `session.user.id`, не к client body
+- XSS-защита: `formatContent()` для серверных, `sanitizeHtml()` для клиентских
+- `prefers-reduced-motion` для доступности
+
+## Цветовая палитра
+
+| Цвет | HEX | Назначение |
+|------|-----|-----------|
+| Оливково-зелёный | `#6A7450` | Основной (primary) |
+| Тёплый оранжевый | `#EC8538` | Акцент (accent) |
+| Кремовый | `#FAF5EF` | Фон |
+| Тёмный олива | `#2A3023` | Footer, текст |
+
+## Лицензия
+
 MIT
