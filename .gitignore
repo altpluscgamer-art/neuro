@@ -54,3 +54,19 @@ extract_pdf.py
 render_pdf.py
 pdf_page_*.png
 pdf_img_*.png
+
+# deploy artifacts
+deploy-pkg/
+neuro-deploy.zip
+ssh_*.py
+check_db.js
+extract_pdf.py
+render_pdf.py
+ssh_audit*.py
+ssh_check.py
+ssh_deploy*.py
+ssh_fix*.py
+ssh_swap.py
+ssh_upload.py
+ssh_finish.py
+
