@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import prisma from "@/lib/prisma";
+import { notifyConsultationRequest } from "@/lib/notifications";
 
 export async function GET() {
   try {
@@ -17,7 +18,7 @@ export async function GET() {
       orderBy: { createdAt: "desc" },
     });
     return NextResponse.json(requests);
-  } catch (error) {
+  } catch {
     return NextResponse.json({ error: "Failed to fetch consultation requests" }, { status: 500 });
   }
 }
@@ -32,11 +33,19 @@ export async function POST(request: Request) {
     }
 
     const consultationRequest = await prisma.consultationRequest.create({
-      data: { userId, name, email, phone, message, status: "new" },
+      data: { userId: userId || null, name, email, phone: phone || null, message, status: "new" },
     });
 
+    notifyConsultationRequest({
+      id: consultationRequest.id,
+      name,
+      email,
+      phone: phone || null,
+      message,
+    }).catch(() => {});
+
     return NextResponse.json(consultationRequest, { status: 201 });
-  } catch (error) {
+  } catch {
     return NextResponse.json({ error: "Failed to create consultation request" }, { status: 500 });
   }
 }

@@ -3,6 +3,7 @@ import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import prisma from "@/lib/prisma";
 import bcrypt from "bcryptjs";
+import { notifyBookingCreated } from "@/lib/notifications";
 
 export async function GET() {
   try {
@@ -92,6 +93,23 @@ export async function POST(request: Request) {
       });
       return created;
     });
+
+    // Notify admin via Telegram
+    const slot = await prisma.scheduleSlot.findUnique({ where: { id: slotId } });
+    if (slot) {
+      notifyBookingCreated({
+        id: booking.id,
+        childName,
+        childAge: parseInt(childAge, 10),
+        slotTitle: slot.title,
+        slotDate: slot.date,
+        slotTime: `${slot.timeStart}–${slot.timeEnd}`,
+        parentName: parentName || childName,
+        parentPhone: parentPhone || "",
+        parentEmail: parentEmail || "",
+        notes: notes || null,
+      }).catch(() => {});
+    }
 
     return NextResponse.json(booking, { status: 201 });
   } catch (error) {

@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { createHmac } from "crypto";
 import prisma from "@/lib/prisma";
 import { getSetting } from "@/lib/settings";
+import { handleTelegramCallback, sendDailyStats } from "@/lib/notifications";
 
 function transliterateSlug(title: string): string {
   const translit: Record<string, string> = {
@@ -89,6 +90,7 @@ async function setBotCommands(token: string) {
         { command: "screening", description: "Пройти анкету" },
         { command: "booking", description: "Записаться на приём" },
         { command: "contacts", description: "Контакты" },
+        { command: "stats", description: "Статистика за сегодня" },
       ],
     }),
   });
@@ -110,6 +112,18 @@ export async function POST(request: Request) {
     const update = await request.json();
     const baseUrl = await getBaseUrl();
     const webAppUrl = `${baseUrl}/telegram-app`;
+
+    // Handle callback queries (inline button presses)
+    if (update.callback_query) {
+      await handleTelegramCallback(update.callback_query);
+      return NextResponse.json({ ok: true });
+    }
+
+    // Handle /stats command
+    if (update.message?.text === "/stats" || update.message?.text === "статистика" || update.message?.text === "Статистика") {
+      await sendDailyStats();
+      return NextResponse.json({ ok: true });
+    }
 
     // Handle /start and /menu commands
     if (update.message?.text) {
@@ -265,7 +279,7 @@ export async function GET() {
       body: JSON.stringify({
         url: webhookUrl,
         secret_token: secret,
-        allowed_updates: ["message", "channel_post"],
+        allowed_updates: ["message", "channel_post", "callback_query"],
       }),
     });
     const webhookResult = await webhookRes.json();

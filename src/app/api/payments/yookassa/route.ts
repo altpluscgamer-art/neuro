@@ -3,6 +3,7 @@ import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import prisma from "@/lib/prisma";
 import { getSetting } from "@/lib/settings";
+import { notifyPaymentCreated } from "@/lib/notifications";
 
 export async function POST(request: Request) {
   try {
@@ -101,6 +102,13 @@ export async function POST(request: Request) {
       where: { id: payment.id },
       data: { providerId },
     });
+
+    notifyPaymentCreated({
+      id: payment.id,
+      courseTitle: course.title,
+      amount: course.price,
+      userEmail: session.user.email,
+    }).catch(() => {});
 
     return NextResponse.json({
       confirmationUrl,
