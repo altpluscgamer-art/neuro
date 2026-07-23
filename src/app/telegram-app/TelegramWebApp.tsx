@@ -64,6 +64,11 @@ export default function TelegramWebApp() {
 
   const siteUrl = typeof window !== "undefined" ? window.location.origin : "";
 
+  const get = (key: string, fallback: string) => {
+    const val = settings[key];
+    return val && val.trim() ? val : fallback;
+  };
+
   return (
     <div className="min-h-screen bg-cream flex flex-col" style={{ paddingBottom: "60px" }}>
       {/* Content area */}
@@ -74,10 +79,10 @@ export default function TelegramWebApp() {
             <div className="rounded-2xl bg-primary-600 p-5 text-white">
               <div className="mb-3 flex items-center gap-2">
                 <Brain className="h-7 w-7" />
-                <span className="text-xl font-bold">Нейро</span>
+                <span className="text-xl font-bold">{get("tg_home_title", "Нейро")}</span>
               </div>
               <p className="text-sm leading-relaxed text-primary-50">
-                Онлайн-платформа для родителей и детских нейропсихологов. Помощь детям от 1 до 13 лет: внимание, память, поведение, адаптация к школе, тревожность.
+                {get("tg_home_description", "Онлайн-платформа для родителей и детских нейропсихологов. Помощь детям от 1 до 13 лет: внимание, память, поведение, адаптация к школе, тревожность.")}
               </p>
             </div>
 
@@ -90,8 +95,8 @@ export default function TelegramWebApp() {
                   <ClipboardList className="h-6 w-6 text-primary-600" />
                 </div>
                 <div>
-                  <p className="font-semibold text-gray-900">Пройти анкету</p>
-                  <p className="text-sm text-gray-500">5–7 минут, персональный отчёт</p>
+                  <p className="font-semibold text-gray-900">{get("tg_home_screening_title", "Пройти анкету")}</p>
+                  <p className="text-sm text-gray-500">{get("tg_home_screening_subtitle", "5–7 минут, персональный отчёт")}</p>
                 </div>
               </div>
             </button>
@@ -105,8 +110,8 @@ export default function TelegramWebApp() {
                   <Calendar className="h-6 w-6 text-accent-600" />
                 </div>
                 <div>
-                  <p className="font-semibold text-gray-900">Записаться на приём</p>
-                  <p className="text-sm text-gray-500">Выбрать удобное время</p>
+                  <p className="font-semibold text-gray-900">{get("tg_home_booking_title", "Записаться на приём")}</p>
+                  <p className="text-sm text-gray-500">{get("tg_home_booking_subtitle", "Выбрать удобное время")}</p>
                 </div>
               </div>
             </button>
@@ -120,8 +125,8 @@ export default function TelegramWebApp() {
                   <Phone className="h-6 w-6 text-teal-600" />
                 </div>
                 <div>
-                  <p className="font-semibold text-gray-900">Контакты</p>
-                  <p className="text-sm text-gray-500">Телефон, email, соцсети</p>
+                  <p className="font-semibold text-gray-900">{get("tg_home_contacts_title", "Контакты")}</p>
+                  <p className="text-sm text-gray-500">{get("tg_home_contacts_subtitle", "Телефон, email, соцсети")}</p>
                 </div>
               </div>
             </button>
@@ -133,7 +138,7 @@ export default function TelegramWebApp() {
               className="block w-full rounded-xl bg-primary-100 p-4 text-center font-medium text-primary-700 transition-[background-color] active:scale-[0.97]"
             >
               <ExternalLink className="mr-1 inline h-4 w-4" />
-              Открыть полную версию сайта
+              {get("tg_home_site_link", "Открыть полную версию сайта")}
             </a>
           </div>
         )}

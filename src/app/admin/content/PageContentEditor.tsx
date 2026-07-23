@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { Save, Loader2, Home, User, Shield, BookOpen, Video, ClipboardList, Calendar, Phone, FileText, Check } from "lucide-react";
+import { Save, Loader2, Home, User, Shield, BookOpen, Video, ClipboardList, Calendar, Phone, FileText, Check, Send } from "lucide-react";
 import { clsx } from "clsx";
 
 type PageTab =
@@ -13,7 +13,8 @@ type PageTab =
   | "screening"
   | "booking"
   | "contacts"
-  | "legal";
+  | "legal"
+  | "telegram";
 
 const tabs: { id: PageTab; label: string; icon: typeof Home }[] = [
   { id: "home", label: "Главная", icon: Home },
@@ -25,6 +26,7 @@ const tabs: { id: PageTab; label: string; icon: typeof Home }[] = [
   { id: "booking", label: "Запись", icon: Calendar },
   { id: "contacts", label: "Контакты", icon: Phone },
   { id: "legal", label: "Правовые", icon: FileText },
+  { id: "telegram", label: "Telegram", icon: Send },
 ];
 
 type FieldType = "text" | "textarea";
@@ -121,6 +123,17 @@ const fieldDefs: Record<PageTab, FieldDef[]> = {
     { key: "page_privacy_title", label: "Заголовок политики конфиденциальности", type: "text", placeholder: "Политика конфиденциальности", group: "Политика" },
     { key: "page_terms_title", label: "Заголовок пользовательского соглашения", type: "text", placeholder: "Пользовательское соглашение", group: "Соглашение" },
   ],
+  telegram: [
+    { key: "tg_home_title", label: "Название (заголовок карточки)", type: "text", placeholder: "Нейро", group: "Hero-карточка" },
+    { key: "tg_home_description", label: "Описание", type: "textarea", placeholder: "Онлайн-платформа для родителей и детских нейропсихологов. Помощь детям от 1 до 13 лет: внимание, память, поведение, адаптация к школе, тревожность.", group: "Hero-карточка" },
+    { key: "tg_home_screening_title", label: "Заголовок кнопки анкеты", type: "text", placeholder: "Пройти анкету", group: "Кнопка «Анкета»" },
+    { key: "tg_home_screening_subtitle", label: "Подзаголовок кнопки анкеты", type: "text", placeholder: "5–7 минут, персональный отчёт", group: "Кнопка «Анкета»" },
+    { key: "tg_home_booking_title", label: "Заголовок кнопки записи", type: "text", placeholder: "Записаться на приём", group: "Кнопка «Запись»" },
+    { key: "tg_home_booking_subtitle", label: "Подзаголовок кнопки записи", type: "text", placeholder: "Выбрать удобное время", group: "Кнопка «Запись»" },
+    { key: "tg_home_contacts_title", label: "Заголовок кнопки контактов", type: "text", placeholder: "Контакты", group: "Кнопка «Контакты»" },
+    { key: "tg_home_contacts_subtitle", label: "Подзаголовок кнопки контактов", type: "text", placeholder: "Телефон, email, соцсети", group: "Кнопка «Контакты»" },
+    { key: "tg_home_site_link", label: "Текст ссылки на сайт", type: "text", placeholder: "Открыть полную версию сайта", group: "Ссылка на сайт" },
+  ],
 };
 
 const groupIcons: Record<string, string> = {
@@ -149,6 +162,11 @@ const groupIcons: Record<string, string> = {
   "Соцсети": "🌐",
   "Политика": "🔒",
   "Соглашение": "📄",
+  "Hero-карточка": "🏠",
+  "Кнопка «Анкета»": "📝",
+  "Кнопка «Запись»": "📅",
+  "Кнопка «Контакты»": "📞",
+  "Ссылка на сайт": "🌐",
 };
 
 export default function PageContentEditor() {
