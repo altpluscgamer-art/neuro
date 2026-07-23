@@ -96,8 +96,15 @@ export default function SettingsPage() {
   const [message, setMessage] = useState<{ type: "ok" | "err"; text: string } | null>(null);
 
   useEffect(() => {
-    fetch("/api/admin/settings")
-      .then((r) => r.json())
+    // Load full settings (with real secret values) — admin is authenticated
+    fetch("/api/admin/settings?full=true")
+      .then((r) => {
+        if (!r.ok) {
+          // Fallback to masked if full fails (e.g. session expired)
+          return fetch("/api/admin/settings").then((r) => r.json());
+        }
+        return r.json();
+      })
       .then((data) => {
         if (typeof data === "object" && !data.error) setSettings(data);
       })

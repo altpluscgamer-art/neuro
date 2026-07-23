@@ -290,12 +290,35 @@ export async function GET() {
     // 3. Set bot commands
     await setBotCommands(botToken);
 
+    // 4. Try sending a test message to verify chat_id works
+    const chatId = await getSetting("telegram_chat_id");
+    let testResult = "not sent";
+    if (chatId) {
+      try {
+        const testRes = await fetch(`https://api.telegram.org/bot${botToken}/sendMessage`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            chat_id: chatId,
+            text: "✅ Бот настроен и работает!\n\nОтправьте /start для меню\nОтправьте /stats для статистики",
+            parse_mode: "HTML",
+          }),
+        });
+        const testData = await testRes.json();
+        testResult = testData.ok ? "sent successfully" : `failed: ${testData.description || "unknown error"}`;
+      } catch (e) {
+        testResult = `error: ${e instanceof Error ? e.message : "unknown"}`;
+      }
+    }
+
     return NextResponse.json({
       ok: true,
       webhook: webhookResult.description || webhookResult,
       webAppUrl,
       menuButton: "set",
       commands: "set",
+      chatId: chatId || "NOT SET",
+      testMessage: testResult,
       message: "Bot configured! Send /start to your bot in Telegram.",
     });
   } catch (error) {

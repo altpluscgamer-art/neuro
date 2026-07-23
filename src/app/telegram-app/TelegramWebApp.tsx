@@ -69,6 +69,16 @@ export default function TelegramWebApp() {
     return val && val.trim() ? val : fallback;
   };
 
+  // Open external link — uses Telegram's openLink if inside Web App
+  const openSite = (url: string) => {
+    const tg = (window as any).Telegram?.WebApp;
+    if (tg && typeof tg.openLink === "function") {
+      tg.openLink(url);
+    } else {
+      window.open(url, "_blank");
+    }
+  };
+
   return (
     <div className="min-h-screen bg-cream flex flex-col" style={{ paddingBottom: "60px" }}>
       {/* Content area */}
@@ -131,15 +141,13 @@ export default function TelegramWebApp() {
               </div>
             </button>
 
-            <a
-              href={siteUrl}
-              target="_blank"
-              rel="noopener noreferrer"
+            <button
+              onClick={() => openSite(siteUrl)}
               className="block w-full rounded-xl bg-primary-100 p-4 text-center font-medium text-primary-700 transition-[background-color] active:scale-[0.97]"
             >
               <ExternalLink className="mr-1 inline h-4 w-4" />
               {get("tg_home_site_link", "Открыть полную версию сайта")}
-            </a>
+            </button>
           </div>
         )}
 
@@ -298,15 +306,13 @@ export default function TelegramWebApp() {
               </div>
             </div>
 
-            <a
-              href={siteUrl}
-              target="_blank"
-              rel="noopener noreferrer"
+            <button
+              onClick={() => openSite(siteUrl)}
               className="block w-full rounded-xl bg-primary-600 py-3 text-center font-semibold text-white transition-[background-color] active:scale-[0.97]"
             >
               <ExternalLink className="mr-1 inline h-4 w-4" />
               Открыть полную версию сайта
-            </a>
+            </button>
           </div>
         )}
       </div>

@@ -51,7 +51,12 @@ export async function PUT(request: Request) {
       return NextResponse.json({ error: "settings object is required" }, { status: 400 });
     }
 
+    // CRITICAL: Skip masked values — don't overwrite secrets with bullets
     for (const [key, value] of Object.entries(settings)) {
+      if (SENSITIVE_KEYS.includes(key) && value === "••••••••") {
+        // User didn't change the field — skip, keep existing value
+        continue;
+      }
       await setSetting(key, String(value));
     }
 
